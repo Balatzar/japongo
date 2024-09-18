@@ -29,4 +29,18 @@ export default class extends Controller {
   saveImage() {
     this.imageDataTarget.value = this.canvas.toDataURL()
   }
+
+  toggleEraser() {
+    if (this.canvas.isDrawingMode) {
+      if (this.canvas.freeDrawingBrush.color === "#FFFFFF") {
+        // Switch back to drawing mode
+        this.canvas.freeDrawingBrush.color = "#000000"
+        this.canvas.freeDrawingBrush.width = 5
+      } else {
+        // Switch to eraser mode
+        this.canvas.freeDrawingBrush.color = "#FFFFFF"
+        this.canvas.freeDrawingBrush.width = 20 // Increased eraser size
+      }
+    }
+  }
 }
