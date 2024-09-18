@@ -25,6 +25,7 @@
     </div>
     
     <div class="px-6 py-4 bg-gray-100">
+      <%= link_to "New", new_hiragana_path, class: "bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2" %>
       <%= link_to "Edit", edit_hiragana_path(@hiragana), class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2" %>
       <%= button_to "Delete", hiragana_path(@hiragana), method: :delete, form: { data: { turbo_confirm: "Are you sure you want to delete this hiragana?" } }, class: "bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mr-2" %>
       <%= link_to "Back", hiraganas_path, class: "bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded" %>
