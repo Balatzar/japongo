@@ -14,4 +14,7 @@ Rails.application.routes.draw do
 
   # Add routes for Hiragana
   resources :hiraganas
+
+  # Add routes for BuildingBlocks
+  resources :building_blocks
 end

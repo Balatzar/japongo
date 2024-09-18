@@ -1,0 +1,36 @@
+<div class="container mx-auto px-4 py-8">
+  <h1 class="text-3xl font-bold mb-6">Building Blocks</h1>
+
+  <div class="overflow-x-auto">
+    <table class="w-full bg-white shadow-md rounded-lg overflow-hidden">
+      <thead class="bg-gray-200">
+        <tr>
+          <th class="px-4 py-2 text-left">Name</th>
+          <th class="px-4 py-2 text-left">Image</th>
+          <th class="px-4 py-2 text-left" colspan="3">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @building_blocks.each do |building_block| %>
+          <tr class="border-b hover:bg-gray-100">
+            <td class="px-4 py-2"><%= building_block.name %></td>
+            <td class="px-4 py-2"><%= image_tag building_block.image, class: "w-16 h-16 object-cover" if building_block.image.present? %></td>
+            <td class="px-4 py-2">
+              <%= link_to "Show", building_block, class: "text-blue-600 hover:text-blue-800" %>
+            </td>
+            <td class="px-4 py-2">
+              <%= link_to "Edit", edit_building_block_path(building_block), class: "text-green-600 hover:text-green-800" %>
+            </td>
+            <td class="px-4 py-2">
+              <%= button_to "Delete", building_block_path(building_block), method: :delete, form: { data: { turbo_confirm: "Are you sure you want to delete this building block?" } }, class: "text-red-600 hover:text-red-800" %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="mt-6">
+    <%= link_to "New Building Block", new_building_block_path, class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
+  </div>
+</div>
