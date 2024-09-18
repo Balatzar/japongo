@@ -17,4 +17,7 @@ Rails.application.routes.draw do
 
   # Add routes for BuildingBlocks
   resources :building_blocks
+
+  # Add routes for Words
+  resources :words
 end

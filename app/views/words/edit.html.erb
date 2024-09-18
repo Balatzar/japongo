@@ -1,0 +1,10 @@
+<div class="container mx-auto px-4 py-8">
+  <h1 class="text-3xl font-bold mb-6">Editing Word</h1>
+
+  <%= render "form", word: @word %>
+
+  <div class="mt-6 space-x-2">
+    <%= link_to "Show", @word, class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
+    <%= link_to "Back", words_path, class: "bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded" %>
+  </div>
+</div>
