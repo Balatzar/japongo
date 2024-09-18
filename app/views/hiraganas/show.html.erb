@@ -22,6 +22,22 @@
         <p class="text-gray-700 font-semibold">Story:</p>
         <p class="text-lg"><%= @hiragana.story %></p>
       </div>
+
+      <div class="mb-4">
+        <p class="text-gray-700 font-semibold">Building Blocks:</p>
+        <% if @hiragana.building_blocks.any? %>
+          <div class="flex flex-wrap items-center gap-2">
+            <% @hiragana.building_blocks.each do |building_block| %>
+              <%= link_to building_block_path(building_block), class: "flex items-center" do %>
+                <%= image_tag building_block.image, class: "w-8 h-8 object-cover rounded-sm mr-1" if building_block.image.attached? %>
+                <span class="text-blue-500 hover:text-blue-700"><%= building_block.name %></span>
+              <% end %>
+            <% end %>
+          </div>
+        <% else %>
+          <p class="text-lg">No building blocks associated with this hiragana.</p>
+        <% end %>
+      </div>
     </div>
     
     <div class="px-6 py-4 bg-gray-100">

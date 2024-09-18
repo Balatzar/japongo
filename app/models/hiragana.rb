@@ -13,4 +13,5 @@
 class Hiragana < ApplicationRecord
   has_one_attached :image
   has_one_attached :story_image
+  has_and_belongs_to_many :building_blocks
 end
