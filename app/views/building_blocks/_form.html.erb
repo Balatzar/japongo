@@ -18,7 +18,7 @@
   <div class="mb-4">
     <%= form.label :image, class: "block text-gray-700 text-sm font-bold mb-2" %>
     <canvas data-drawing-target="canvas" width="300" height="300" class="border border-gray-300"></canvas>
-    <%= form.hidden_field :image_data, data: { drawing_target: "imageData" } %>
+    <%= form.hidden_field :image_data, data: { drawing_target: "imageData" }, value: building_block.image.attached? ? url_for(building_block.image) : nil %>
   </div>
 
   <div class="mb-4">
