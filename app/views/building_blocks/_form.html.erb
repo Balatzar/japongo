@@ -1,4 +1,4 @@
-<%= form_with(model: building_block, local: true, class: "bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4") do |form| %>
+<%= form_with(model: building_block, local: true, class: "bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4", data: { controller: "drawing", action: "submit->drawing#saveImage" }) do |form| %>
   <% if building_block.errors.any? %>
     <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
       <strong class="font-bold">Error:</strong>
@@ -17,7 +17,12 @@
 
   <div class="mb-4">
     <%= form.label :image, class: "block text-gray-700 text-sm font-bold mb-2" %>
-    <%= form.file_field :image, class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+    <canvas data-drawing-target="canvas" width="300" height="300" class="border border-gray-300"></canvas>
+    <%= form.hidden_field :image_data, data: { drawing_target: "imageData" } %>
+  </div>
+
+  <div class="mb-4">
+    <button type="button" data-action="click->drawing#clear" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Clear Canvas</button>
   </div>
 
   <div class="flex items-center justify-between">

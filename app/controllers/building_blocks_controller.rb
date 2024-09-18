@@ -42,6 +42,6 @@ class BuildingBlocksController < ApplicationController
   private
 
   def building_block_params
-    params.require(:building_block).permit(:name, :image)
+    params.require(:building_block).permit(:name, :image_data)
   end
 end
