@@ -11,4 +11,7 @@
 #  updated_at      :datetime         not null
 #
 class Word < ApplicationRecord
+  def self.matched_to_hiraganas
+    MatchedWordsService.call
+  end
 end
