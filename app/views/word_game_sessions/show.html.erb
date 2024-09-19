@@ -2,7 +2,10 @@
   <h2 class="text-2xl font-bold mb-4">Word Game</h2>
   
   <% if @current_word %>
-    <div data-controller="word-game" data-word-game-word-id-value="<%= @current_word.id %>" data-word-game-session-id-value="<%= @word_game_session.id %>">
+    <div data-controller="word-game" 
+         data-word-game-word-id-value="<%= @current_word.id %>" 
+         data-word-game-session-id-value="<%= @word_game_session.id %>"
+         data-action="keydown@window->word-game#handleKeydown">
       <p class="text-lg mb-2">Translate the following hiragana:</p>
       <p class="text-4xl font-bold mb-4"><%= @current_word.hiragana %></p>
       
@@ -16,7 +19,7 @@
         <p class="font-bold">English Meaning: <span data-word-game-target="englishMeaning"></span></p>
         <p class="font-bold">Kanji: <span data-word-game-target="kanji"></span></p>
       </div>
-      <button data-action="click->word-game#nextWord" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded mt-4 hidden" data-word-game-target="nextButton">Next</button>
+      <button data-action="click->word-game#nextWord keydown->word-game#nextWord" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded mt-4 hidden" data-word-game-target="nextButton">Next</button>
     </div>
   <% else %>
     <p class="text-lg">Game Over! You've completed all the words.</p>

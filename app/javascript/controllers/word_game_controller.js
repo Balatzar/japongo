@@ -7,6 +7,14 @@ export default class extends Controller {
     sessionId: Number
   }
 
+  connect() {
+    this.focusInput()
+  }
+
+  focusInput() {
+    this.inputTarget.focus()
+  }
+
   checkAnswer(event) {
     event.preventDefault()
     const answer = this.inputTarget.value.trim().toLowerCase()
@@ -33,10 +41,20 @@ export default class extends Controller {
       this.kanjiTarget.textContent = data.kanji
       this.meaningTarget.classList.remove("hidden")
       this.nextButtonTarget.classList.remove("hidden")
+      this.nextButtonTarget.focus()
     })
   }
 
-  nextWord() {
+  nextWord(event) {
+    if (event.type === "keydown" && event.key !== "Enter") {
+      return
+    }
     Turbo.visit(window.location.href, { action: "replace" })
+  }
+
+  handleKeydown(event) {
+    if (event.key === "Enter" && !this.nextButtonTarget.classList.contains("hidden")) {
+      this.nextWord(event)
+    }
   }
 }
