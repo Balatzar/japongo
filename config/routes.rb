@@ -27,4 +27,6 @@ Rails.application.routes.draw do
       get :init
     end
   end
+
+  root "word_game_sessions#init"
 end
