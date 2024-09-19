@@ -2,12 +2,9 @@
 #
 # Table name: word_game_sessions
 #
-#  id              :bigint           not null, primary key
-#  created_at      :datetime         not null
-#  updated_at      :datetime         not null
-#  right_answer_id :bigint
-#  word_id         :bigint
-#  wrong_answer_id :bigint
+#  id         :bigint           not null, primary key
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
 #
 class WordGameSession < ApplicationRecord
   has_and_belongs_to_many :words
