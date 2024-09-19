@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_09_18_172326) do
+ActiveRecord::Schema[7.2].define(version: 2024_09_20_000002) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -62,6 +62,35 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_18_172326) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "translated_name"
+  end
+
+  create_table "word_game_sessions", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "right_answer_id"
+    t.bigint "wrong_answer_id"
+    t.bigint "word_id"
+  end
+
+  create_table "word_game_sessions_right_answers", id: false, force: :cascade do |t|
+    t.bigint "word_game_session_id", null: false
+    t.bigint "word_id", null: false
+    t.index ["word_game_session_id", "word_id"], name: "index_wgs_right_answers"
+    t.index ["word_id", "word_game_session_id"], name: "index_right_answers_wgs"
+  end
+
+  create_table "word_game_sessions_words", id: false, force: :cascade do |t|
+    t.bigint "word_game_session_id", null: false
+    t.bigint "word_id", null: false
+    t.index ["word_game_session_id", "word_id"], name: "idx_on_word_game_session_id_word_id_c9bc447f30"
+    t.index ["word_id", "word_game_session_id"], name: "idx_on_word_id_word_game_session_id_5e0aafa943"
+  end
+
+  create_table "word_game_sessions_wrong_answers", id: false, force: :cascade do |t|
+    t.bigint "word_game_session_id", null: false
+    t.bigint "word_id", null: false
+    t.index ["word_game_session_id", "word_id"], name: "index_wgs_wrong_answers"
+    t.index ["word_id", "word_game_session_id"], name: "index_wrong_answers_wgs"
   end
 
   create_table "words", force: :cascade do |t|
