@@ -14,10 +14,9 @@ class CrosswordGameInitializerService
 
     while placed_words.size < WORDS_TO_PLACE
       word_to_place = find_intersecting_word(words - placed_words, placed_words)
-      pp word_to_place
       break unless word_to_place
 
-      if place_word(grid, word_to_place, placed_words)
+      if place_word(grid, word_to_place, placed_words, words)
         placed_words << word_to_place
       end
     end
@@ -32,12 +31,11 @@ class CrosswordGameInitializerService
   def self.check_grid(grid)
     # Check horizontal words
     grid.each do |row|
-      pp "row: #{row.join}"
       return false unless check_words_in_line(row.join)
     end
 
     # Check vertical words
-    GRID_SIZE.times do |col|
+    grid.length.times do |col|
       vertical_line = grid.map { |row| row[col] }.join
       return false unless check_words_in_line(vertical_line)
     end
@@ -49,7 +47,6 @@ class CrosswordGameInitializerService
 
   def self.check_words_in_line(line)
     line.split(" ").each do |word_candidate|
-      pp word_candidate
       next if word_candidate.length <= 1
       unless @@all_words.key?(word_candidate)
         return false
@@ -64,8 +61,8 @@ class CrosswordGameInitializerService
 
   def self.place_biggest_word(grid, word)
     word_length = word.romanji.length
-    start_row = GRID_SIZE / 2
-    start_col = (GRID_SIZE - word_length) / 2
+    start_row = grid.length / 2
+    start_col = (grid.length - word_length) / 2
 
     word.romanji.each_char.with_index do |char, index|
       grid[start_row][start_col + index] = char
@@ -79,22 +76,34 @@ class CrosswordGameInitializerService
     end
   end
 
-  def self.place_word(grid, word, placed_words)
+  def self.place_word(grid, word, placed_words, words)
     placed_chars = placed_words.flat_map { |w| w.romanji.chars }.uniq
     common_chars = word.romanji.chars & placed_chars
 
     common_chars.each do |common_char|
       word_index = word.romanji.index(common_char)
 
-      GRID_SIZE.times do |row|
-        GRID_SIZE.times do |col|
+      grid.length.times do |row|
+        grid.length.times do |col|
           if grid[row][col] == common_char
             if can_place_horizontally?(grid, word, row, col - word_index)
               place_horizontally(grid, word, row, col - word_index)
-              return true
+              if check_grid(grid)
+                return true
+              else
+                remove_horizontally(grid, word, row, col - word_index)
+                words.delete(word)
+                return false
+              end
             elsif can_place_vertically?(grid, word, row - word_index, col)
               place_vertically(grid, word, row - word_index, col)
-              return true
+              if check_grid(grid)
+                return true
+              else
+                remove_vertically(grid, word, row - word_index, col)
+                words.delete(word)
+                return false
+              end
             end
           end
         end
@@ -105,7 +114,7 @@ class CrosswordGameInitializerService
   end
 
   def self.can_place_horizontally?(grid, word, row, start_col)
-    return false if start_col < 0 || start_col + word.romanji.length > GRID_SIZE
+    return false if start_col < 0 || start_col + word.romanji.length > grid.length
 
     word.romanji.each_char.with_index do |char, index|
       col = start_col + index
@@ -116,7 +125,7 @@ class CrosswordGameInitializerService
   end
 
   def self.can_place_vertically?(grid, word, start_row, col)
-    return false if start_row < 0 || start_row + word.romanji.length > GRID_SIZE
+    return false if start_row < 0 || start_row + word.romanji.length > grid.length
 
     word.romanji.each_char.with_index do |char, index|
       row = start_row + index
@@ -135,6 +144,18 @@ class CrosswordGameInitializerService
   def self.place_vertically(grid, word, start_row, col)
     word.romanji.each_char.with_index do |char, index|
       grid[start_row + index][col] = char
+    end
+  end
+
+  def self.remove_horizontally(grid, word, row, start_col)
+    word.romanji.length.times do |index|
+      grid[row][start_col + index] = " "
+    end
+  end
+
+  def self.remove_vertically(grid, word, start_row, col)
+    word.romanji.length.times do |index|
+      grid[start_row + index][col] = " "
     end
   end
 end

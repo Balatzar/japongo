@@ -89,4 +89,64 @@ class CrosswordGameInitializerServiceTest < ActiveSupport::TestCase
 
     assert CrosswordGameInitializerService.check_grid(grid)
   end
+
+  test "place_word successfully adds a valid word" do
+    grid = [
+      [ " ", " ", " ", "b", " ", " ", " " ],
+      [ " ", " ", " ", "i", " ", " ", " " ],
+      [ " ", " ", " ", "r", " ", " ", " " ],
+      [ " ", " ", " ", "d", " ", " ", " " ],
+      [ " ", " ", " ", " ", " ", " ", " " ],
+      [ " ", " ", " ", " ", " ", " ", " " ],
+      [ " ", " ", " ", " ", " ", " ", " " ]
+    ]
+    word = @sample_words["dog"]
+    placed_words = [ @sample_words["bird"] ]
+    words = @sample_words.values
+
+    assert CrosswordGameInitializerService.place_word(grid, word, placed_words, words)
+    assert CrosswordGameInitializerService.check_grid(grid)
+  end
+
+  test "place_word cannot place an invalid word" do
+    grid = [
+      [ "c", "a", "t", " ", " ", " ", " " ],
+      [ " ", " ", " ", " ", " ", " ", " " ],
+      [ " ", " ", " ", " ", " ", " ", " " ],
+      [ " ", " ", " ", " ", " ", " ", " " ],
+      [ " ", " ", " ", " ", " ", " ", " " ],
+      [ " ", " ", " ", " ", " ", " ", " " ],
+      [ " ", " ", " ", " ", " ", " ", " " ]
+    ]
+    invalid_word = Word.new(romanji: "invalid")
+    placed_words = [ @sample_words["cat"] ]
+    words = @sample_words.values + [ invalid_word ]
+
+    assert_not CrosswordGameInitializerService.place_word(grid, invalid_word, placed_words, words)
+    assert CrosswordGameInitializerService.check_grid(grid)
+  end
+
+  test "add a word to an existing grid" do
+    grid = [
+      [ "c", "a", "t", " ", " ", " ", " " ],
+      [ " ", " ", " ", " ", " ", " ", " " ],
+      [ " ", " ", " ", "b", " ", " ", " " ],
+      [ " ", " ", " ", "i", " ", " ", " " ],
+      [ " ", " ", " ", "r", " ", " ", " " ],
+      [ " ", " ", " ", "d", "o", "g", " " ],
+      [ " ", " ", " ", " ", " ", " ", " " ]
+    ]
+    word = @sample_words["fish"]
+    placed_words = [ @sample_words["cat"], @sample_words["bird"], @sample_words["dog"] ]
+    assert CrosswordGameInitializerService.place_word(grid, word, placed_words, @sample_words)
+    assert_equal [
+      [ "c", "a", "t", " ", " ", " ", " " ],
+      [ " ", " ", " ", " ", " ", " ", " " ],
+      [ " ", " ", " ", "b", " ", " ", " " ],
+      [ " ", " ", "f", "i", "s", "h", " " ],
+      [ " ", " ", " ", "r", " ", " ", " " ],
+      [ " ", " ", " ", "d", "o", "g", " " ],
+      [ " ", " ", " ", " ", " ", " ", " " ]
+    ], grid
+  end
 end
