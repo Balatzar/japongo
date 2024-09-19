@@ -10,8 +10,12 @@ class CrosswordGameInitializerService
     biggest_word = words.max_by { |word| word.romanji.length }
     pp "biggest_word: #{biggest_word.romanji.inspect}"
     grid = initialize_grid
-    placed_words = [ biggest_word ]
-    place_biggest_word(grid, biggest_word)
+    placed_words = []
+    word_placements = {}
+
+    start_row, start_col = place_biggest_word(grid, biggest_word)
+    placed_words << biggest_word
+    word_placements[biggest_word] = { direction: "horizontal", start: [start_row, start_col] }
     pp grid
 
     maximum = 50
@@ -24,10 +28,12 @@ class CrosswordGameInitializerService
       break if i > maximum
       i += 1
 
-      if place_word(grid, word_to_place, placed_words, words)
+      placement = place_word(grid, word_to_place, placed_words, words)
+      if placement
         pp "Word has been placed"
         pp grid
         placed_words << word_to_place
+        word_placements[word_to_place] = placement
       end
     end
 
@@ -39,10 +45,13 @@ class CrosswordGameInitializerService
     pp "Cleaned grid:"
     print_grid(cleaned_grid)
 
+    clues = generate_clues(placed_words, word_placements, grid, cleaned_grid)
+
     {
       words: words,
       placed_words: placed_words,
-      grid: cleaned_grid
+      grid: cleaned_grid,
+      clues: clues
     }
   end
 
@@ -86,6 +95,8 @@ class CrosswordGameInitializerService
     word.romanji.each_char.with_index do |char, index|
       grid[start_row][start_col + index] = char
     end
+
+    [start_row, start_col]
   end
 
   def self.find_intersecting_word(words, placed_words)
@@ -112,7 +123,7 @@ class CrosswordGameInitializerService
             if can_place_horizontally?(grid, word, row, col - word_index)
               place_horizontally(grid, word, row, col - word_index)
               if check_grid(grid)
-                return true
+                return { direction: "horizontal", start: [row, col - word_index] }
               else
                 remove_horizontally(grid, word, row, col - word_index, col)
                 words.delete(word)
@@ -121,7 +132,7 @@ class CrosswordGameInitializerService
               pp "We can place vertically"
               place_vertically(grid, word, row - word_index, col)
               if check_grid(grid)
-                return true
+                return { direction: "vertical", start: [row - word_index, col] }
               else
                 pp "The grid was invalid"
                 pp grid
@@ -209,6 +220,26 @@ class CrosswordGameInitializerService
   def self.print_grid(grid)
     grid.each do |row|
       puts row.map { |cell| cell == " " ? "." : cell }.join
+    end
+  end
+
+  def self.generate_clues(placed_words, word_placements, original_grid, cleaned_grid)
+    row_offset = original_grid.index { |row| row.any? { |cell| cell != " " } } || 0
+    col_offset = original_grid.transpose.index { |col| col.any? { |cell| cell != " " } } || 0
+
+    placed_words.map do |word|
+      placement = word_placements[word]
+      original_start = placement[:start]
+      cleaned_start = [
+        original_start[0] - row_offset,
+        original_start[1] - col_offset
+      ]
+
+      {
+        word: word.romanji,
+        direction: placement[:direction],
+        starting_index: cleaned_start
+      }
     end
   end
 end
