@@ -1,18 +1,27 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = [ "input", "result", "meaning", "englishMeaning", "kanji", "nextButton" ]
+  static targets = [ "input", "result", "meaning", "englishMeaning", "kanji", "nextButton", "progressBar", "progressText" ]
   static values = {
     wordId: Number,
-    sessionId: Number
+    sessionId: Number,
+    totalWords: Number,
+    currentIndex: Number
   }
 
   connect() {
     this.focusInput()
+    this.updateProgress()
   }
 
   focusInput() {
     this.inputTarget.focus()
+  }
+
+  updateProgress() {
+    const progress = (this.currentIndexValue / this.totalWordsValue) * 100
+    this.progressBarTarget.style.width = `${progress}%`
+    this.progressTextTarget.textContent = `Word ${this.currentIndexValue + 1} of ${this.totalWordsValue}`
   }
 
   checkAnswer(event) {
@@ -42,6 +51,13 @@ export default class extends Controller {
       this.meaningTarget.classList.remove("hidden")
       this.nextButtonTarget.classList.remove("hidden")
       this.nextButtonTarget.focus()
+
+      if (data.completed) {
+        this.nextButtonTarget.textContent = "See Results"
+      }
+
+      this.currentIndexValue += 1
+      this.updateProgress()
     })
   }
 

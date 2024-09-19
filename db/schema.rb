@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_09_20_000004) do
+ActiveRecord::Schema[7.2].define(version: 2024_09_20_000005) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -67,6 +67,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_20_000004) do
   create_table "word_game_sessions", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "current_word_index", default: 0
   end
 
   create_table "word_game_sessions_right_answers", id: false, force: :cascade do |t|
