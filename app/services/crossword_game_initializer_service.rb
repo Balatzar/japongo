@@ -2,8 +2,11 @@ class CrosswordGameInitializerService
   GRID_SIZE = 30
   WORDS_TO_PLACE = 10
 
+  @@all_words = {}
+
   def self.initialize_game
-    words = Word.order("RANDOM()").limit(50)
+    @@all_words = Word.all.index_by(&:romanji)
+    words = @@all_words.values.sample(50)
     biggest_word = words.max_by { |word| word.romanji.length }
     grid = initialize_grid
     placed_words = [ biggest_word ]
@@ -26,7 +29,34 @@ class CrosswordGameInitializerService
     }
   end
 
+  def self.check_grid(grid)
+    # Check horizontal words
+    grid.each do |row|
+      pp "row: #{row.join}"
+      return false unless check_words_in_line(row.join)
+    end
+
+    # Check vertical words
+    GRID_SIZE.times do |col|
+      vertical_line = grid.map { |row| row[col] }.join
+      return false unless check_words_in_line(vertical_line)
+    end
+
+    true
+  end
+
   private
+
+  def self.check_words_in_line(line)
+    line.split(" ").each do |word_candidate|
+      pp word_candidate
+      next if word_candidate.length <= 1
+      unless @@all_words.key?(word_candidate)
+        return false
+      end
+    end
+    true
+  end
 
   def self.initialize_grid
     Array.new(GRID_SIZE) { Array.new(GRID_SIZE, " ") }
