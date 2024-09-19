@@ -20,4 +20,11 @@ Rails.application.routes.draw do
 
   # Add routes for Words
   resources :words
+
+  # Add routes for WordGameSession
+  resources :word_game_sessions, only: [ :show, :update ] do
+    collection do
+      get :init
+    end
+  end
 end

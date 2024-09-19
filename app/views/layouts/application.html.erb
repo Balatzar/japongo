@@ -21,13 +21,16 @@
 
   <body>
     <header class="bg-blue-600 text-white p-4">
-      <h1 class="text-3xl font-bold text-center">Japongo</h1>
+      <div class="container mx-auto flex justify-between items-center">
+        <h1 class="text-3xl font-bold">Japongo</h1>
+      </div>
     </header>
     <nav class="bg-blue-500 p-2">
       <ul class="flex justify-center space-x-4">
         <li><%= link_to "Hiraganas", hiraganas_path, class: "text-white hover:text-blue-200" %></li>
         <li><%= link_to "Building blocks", building_blocks_path, class: "text-white hover:text-blue-200" %></li>
         <li><%= link_to "Words", words_path, class: "text-white hover:text-blue-200" %></li>
+        <%= link_to "Play", init_word_game_sessions_path, class: "bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded" %>
       </ul>
     </nav>
     <main class="container mx-auto mt-28 px-5 flex">

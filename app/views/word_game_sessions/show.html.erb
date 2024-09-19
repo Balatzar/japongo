@@ -1,0 +1,24 @@
+<div class="max-w-md mx-auto mt-8">
+  <h2 class="text-2xl font-bold mb-4">Word Game</h2>
+  
+  <% if @current_word %>
+    <div data-controller="word-game" data-word-game-word-id-value="<%= @current_word.id %>" data-word-game-session-id-value="<%= @word_game_session.id %>">
+      <p class="text-lg mb-2">Translate the following hiragana:</p>
+      <p class="text-4xl font-bold mb-4"><%= @current_word.hiragana %></p>
+      
+      <%= form_with url: word_game_session_path(@word_game_session), method: :patch, data: { action: "submit->word-game#checkAnswer" } do |f| %>
+        <%= f.text_field :answer, class: "w-full p-2 border rounded mb-4", placeholder: "Enter romanji", data: { "word-game-target": "input" } %>
+        <%= f.submit "Submit", class: "bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded" %>
+      <% end %>
+      
+      <div data-word-game-target="result" class="mt-4"></div>
+    </div>
+  <% else %>
+    <p class="text-lg">Game Over! You've completed all the words.</p>
+    <p class="mt-4">
+      Correct answers: <%= @word_game_session.right_answers.count %><br>
+      Wrong answers: <%= @word_game_session.wrong_answers.count %>
+    </p>
+    <%= link_to "Play Again", new_word_game_session_path, class: "bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded mt-4 inline-block" %>
+  <% end %>
+</div>
