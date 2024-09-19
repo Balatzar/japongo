@@ -2,7 +2,11 @@ class WordsController < ApplicationController
   before_action :set_word, only: [:show, :edit, :update, :destroy]
 
   def index
-    @pagy, @words = pagy(Word.all)
+    @words = Word.all
+    if params[:search].present?
+      @words = @words.where("romanji LIKE ?", "%#{params[:search]}%")
+    end
+    @pagy, @words = pagy(@words)
   end
 
   def show

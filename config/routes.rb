@@ -28,5 +28,8 @@ Rails.application.routes.draw do
     end
   end
 
-  root "word_game_sessions#init"
+  # Add routes for Games
+  resources :games, only: [ :index ]
+
+  root "games#index"
 end
