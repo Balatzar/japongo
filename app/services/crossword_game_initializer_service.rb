@@ -31,10 +31,18 @@ class CrosswordGameInitializerService
       end
     end
 
+    pp "Original grid:"
+    print_grid(grid)
+
+    cleaned_grid = clean_grid(grid)
+
+    pp "Cleaned grid:"
+    print_grid(cleaned_grid)
+
     {
       words: words,
       placed_words: placed_words,
-      grid: grid
+      grid: cleaned_grid
     }
   end
 
@@ -58,7 +66,6 @@ class CrosswordGameInitializerService
   def self.check_words_in_line(line)
     line.split(" ").each do |word_candidate|
       next if word_candidate.length <= 1
-      pp @@all_words
       unless @@all_words.key?(word_candidate)
         pp "Word not found: #{word_candidate.inspect}"
         return false
@@ -173,6 +180,35 @@ class CrosswordGameInitializerService
   def self.remove_vertically(grid, word, start_row, col, initial_row)
     word.romanji.length.times do |index|
       grid[start_row + index][col] = " " unless start_row + index == initial_row # Don't remove the intersecting character
+    end
+  end
+
+  def self.clean_grid(grid)
+    pp "Cleaning grid..."
+    pp "Original grid size: #{grid.size}x#{grid[0].size}"
+
+    # Find the first and last non-empty rows
+    first_non_empty_row = grid.index { |row| row.any? { |cell| cell != " " } }
+    last_non_empty_row = grid.rindex { |row| row.any? { |cell| cell != " " } }
+
+    # Find the first and last non-empty columns
+    transposed_grid = grid.transpose
+    first_non_empty_col = transposed_grid.index { |col| col.any? { |cell| cell != " " } }
+    last_non_empty_col = transposed_grid.rindex { |col| col.any? { |cell| cell != " " } }
+
+    # Slice the grid to keep only non-empty rows and columns
+    cleaned_grid = grid[first_non_empty_row..last_non_empty_row].map do |row|
+      row[first_non_empty_col..last_non_empty_col]
+    end
+
+    pp "Cleaned grid size: #{cleaned_grid.size}x#{cleaned_grid[0].size}"
+
+    cleaned_grid
+  end
+
+  def self.print_grid(grid)
+    grid.each do |row|
+      puts row.map { |cell| cell == " " ? "." : cell }.join
     end
   end
 end
