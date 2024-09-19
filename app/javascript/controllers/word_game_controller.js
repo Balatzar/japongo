@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = [ "input", "result" ]
+  static targets = [ "input", "result", "meaning", "englishMeaning", "kanji", "nextButton" ]
   static values = {
     wordId: Number,
     sessionId: Number
@@ -12,10 +12,10 @@ export default class extends Controller {
     const answer = this.inputTarget.value.trim().toLowerCase()
     
     fetch(`/word_game_sessions/${this.sessionIdValue}`, {
-      method: 'PATCH',
+      method: "PATCH",
       headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
+        "Content-Type": "application/json",
+        "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content
       },
       body: JSON.stringify({ word_id: this.wordIdValue, answer: answer })
     })
@@ -29,10 +29,14 @@ export default class extends Controller {
         this.resultTarget.classList.add("text-red-500")
       }
       
-      // Refresh the page after a short delay to show the next word
-      setTimeout(() => {
-        Turbo.visit(window.location.href, { action: "replace" })
-      }, 2000)
+      this.englishMeaningTarget.textContent = data.english_meaning
+      this.kanjiTarget.textContent = data.kanji
+      this.meaningTarget.classList.remove("hidden")
+      this.nextButtonTarget.classList.remove("hidden")
     })
+  }
+
+  nextWord() {
+    Turbo.visit(window.location.href, { action: "replace" })
   }
 }

@@ -22,6 +22,11 @@ class WordGameSessionsController < ApplicationController
       correct = false
     end
 
-    render json: { correct: correct, correct_answer: word.romanji }
+    render json: {
+      correct: correct,
+      correct_answer: word.romanji,
+      english_meaning: word.english_meaning,
+      kanji: word.kanji
+    }
   end
 end
