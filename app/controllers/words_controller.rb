@@ -2,7 +2,7 @@ class WordsController < ApplicationController
   before_action :set_word, only: [:show, :edit, :update, :destroy]
 
   def index
-    @words = Word.all
+    @pagy, @words = pagy(Word.all)
   end
 
   def show

@@ -34,7 +34,29 @@
     </table>
   </div>
 
-  <div class="mt-6">
-    <%= link_to "New Word", new_word_path, class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
+  <div class="mt-12 flex justify-center">
+    <nav class="inline-flex space-x-4">
+      <%== pagy_nav(@pagy) do |pagy| %>
+        <% if pagy.prev %>
+          <%= link_to pagy.prev, pagy_url_for(pagy, pagy.prev), class: "px-6 py-3 rounded-lg border border-gray-300 bg-white text-xl font-medium text-gray-500 hover:bg-gray-50 hover:text-blue-600 transition-colors duration-200" %>
+        <% end %>
+        
+        <% pagy.series.each do |item| %>
+          <% if item.is_a?(Integer) %>
+            <%= link_to item, pagy_url_for(pagy, item), class: "px-6 py-3 rounded-lg border border-gray-300 bg-white text-xl font-medium hover:bg-gray-50 transition-colors duration-200 #{pagy.page == item ? 'bg-blue-50 text-blue-600 border-blue-300' : 'text-gray-500 hover:text-blue-600'}" %>
+          <% elsif item.is_a?(String) %>
+            <span class="px-6 py-3 rounded-lg border border-gray-300 bg-white text-xl font-medium text-gray-400"><%= item %></span>
+          <% end %>
+        <% end %>
+        
+        <% if pagy.next %>
+          <%= link_to pagy.next, pagy_url_for(pagy, pagy.next), class: "px-6 py-3 rounded-lg border border-gray-300 bg-white text-xl font-medium text-gray-500 hover:bg-gray-50 hover:text-blue-600 transition-colors duration-200" %>
+        <% end %>
+      <% end %>
+    </nav>
+  </div>
+
+  <div class="mt-12">
+    <%= link_to "New Word", new_word_path, class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors duration-200" %>
   </div>
 </div>
