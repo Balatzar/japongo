@@ -32,7 +32,7 @@
             <% @crossword_game_session.clues.select { |c| c["direction"] == "horizontal" }.each do |clue| %>
               <li>
                 <%= clue["starting_index"].join(", ") %>: 
-                <%= @crossword_game_session.words.find { |word| word.hiragana == clue["word"] }.english_meaning %>
+                <%= @crossword_game_session.words.find { |word| word.hiragana == clue["word"]["hiragana"] }.english_meaning %>
               </li>
             <% end %>
           </ul>
@@ -43,7 +43,7 @@
             <% @crossword_game_session.clues.select { |c| c["direction"] == "vertical" }.each do |clue| %>
               <li>
                 <%= clue["starting_index"].join(", ") %>: 
-                <%= @crossword_game_session.words.find { |word| word.hiragana == clue["word"] }.english_meaning %>
+                <%= @crossword_game_session.words.find { |word| word.hiragana == clue["word"]["hiragana"] }.english_meaning %>
               </li>
             <% end %>
           </ul>

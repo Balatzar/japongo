@@ -80,7 +80,7 @@ class CrosswordGameInitializerServiceWithGridTest < ActiveSupport::TestCase
     result = service.run
 
     # New word sea should be returned as a clue
-    assert_includes result[:clues], sample_words["sea"], "The word 'sea' should be returned as a clue"
+    assert result[:clues].find { |clue| clue[:word] == sample_words["sea"] }, "The word 'sea' should be returned as a clue"
     # And as a placed word
     assert_includes result[:placed_words], sample_words["sea"], "The word 'sea' should be placed in the grid"  end
 end

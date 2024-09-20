@@ -16,7 +16,7 @@ class ClueGeneratorService
       ]
 
       {
-        word: word_field(word),
+        word: word,
         direction: placement[:direction],
         starting_index: cleaned_start
       }

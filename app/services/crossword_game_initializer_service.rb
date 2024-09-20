@@ -70,7 +70,18 @@ class CrosswordGameInitializerService
     log "Cleaned grid:"
     @grid_initializer.print_grid(cleaned_grid)
 
-    clues = @clue_generator.generate_clues(placed_words, word_placements, grid, cleaned_grid)
+    # Extract all valid words from the final grid
+    all_words = extract_words_from_grid(cleaned_grid)
+
+    # Add new words to placed_words and word_placements
+    all_words.each do |word|
+      unless placed_words.include?(word)
+        placed_words << word
+        word_placements[word] = find_word_placement(cleaned_grid, word)
+      end
+    end
+
+    clues = @clue_generator.generate_clues(placed_words, word_placements, cleaned_grid, cleaned_grid)
 
     {
       placed_words: placed_words,
