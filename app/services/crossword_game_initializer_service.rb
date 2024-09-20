@@ -1,35 +1,47 @@
 class CrosswordGameInitializerService
   GRID_SIZE = 30
 
-  attr_reader :word_dictionary, :words, :words_to_place, :use_hiragana, :enable_logging
+  attr_reader :word_dictionary, :words, :words_to_place, :use_hiragana, :enable_logging, :existing_grid
 
-  def initialize(word_dictionary: nil, words: nil, words_to_place: 10, use_hiragana: true, enable_logging: false)
+  def initialize(word_dictionary: nil, words: nil, words_to_place: 10, use_hiragana: true, enable_logging: false, existing_grid: nil)
     @use_hiragana = use_hiragana
     @enable_logging = enable_logging
     @word_dictionary = word_dictionary || Word.all.index_by { |word| word_field(word) }
     @words = words || Word.all.sample(2_000)
     @words_to_place = words_to_place
+    @existing_grid = existing_grid
   end
 
   def run
-    biggest_word = words.max_by { |word| word_field(word).length }
-    log "biggest_word: #{word_field(biggest_word).inspect}"
-    grid = initialize_grid
+    grid = @existing_grid ? @existing_grid.map(&:dup) : initialize_grid
     placed_words = []
     word_placements = {}
 
-    start_row, start_col = place_biggest_word(grid, biggest_word)
-    placed_words << biggest_word
-    word_placements[biggest_word] = { direction: "horizontal", start: [ start_row, start_col ] }
-    log grid
+    if @existing_grid
+      log "Using existing grid:"
+      print_grid(grid)
+      existing_words = extract_words_from_grid(grid)
+      log "Existing words: #{existing_words.inspect}"
+      placed_words.concat(existing_words)
+      existing_words.each do |word|
+        word_placements[word] = find_word_placement(grid, word)
+      end
+    else
+      biggest_word = words.max_by { |word| word_field(word).length }
+      log "biggest_word: #{word_field(biggest_word).inspect}"
+      start_row, start_col = place_biggest_word(grid, biggest_word)
+      placed_words << biggest_word
+      word_placements[biggest_word] = { direction: "horizontal", start: [ start_row, start_col ] }
+      log grid
+    end
 
     maximum = 1_000
     i = 0
 
-    while placed_words.size < words_to_place
+    while placed_words.size <= words_to_place
       word_to_place = find_intersecting_word(words - placed_words, placed_words)
-      log "word_to_place: #{word_field(word_to_place).inspect}"
       break unless word_to_place
+      log "word_to_place: #{word_field(word_to_place).inspect}"
       break if i > maximum
       i += 1
 
@@ -187,13 +199,13 @@ class CrosswordGameInitializerService
 
   def place_horizontally(grid, word, row, start_col)
     word_field(word).each_char.with_index do |char, index|
-      grid[row][start_col + index] = char
+      grid[row][start_col + index] = char unless grid[row][start_col + index] != " "
     end
   end
 
   def place_vertically(grid, word, start_row, col)
     word_field(word).each_char.with_index do |char, index|
-      grid[start_row + index][col] = char
+      grid[start_row + index][col] = char unless grid[start_row + index][col] != " "
     end
   end
 
@@ -256,5 +268,34 @@ class CrosswordGameInitializerService
         starting_index: cleaned_start
       }
     end
+  end
+
+  def extract_words_from_grid(grid)
+    words = []
+    # Extract horizontal words
+    grid.each do |row|
+      words.concat(extract_words_from_line(row.join))
+    end
+    # Extract vertical words
+    grid.transpose.each do |col|
+      words.concat(extract_words_from_line(col.join))
+    end
+    words.uniq.map { |word| word_dictionary[word] }
+  end
+
+  def extract_words_from_line(line)
+    line.split(" ").select { |word| word.length > 1 && word_dictionary.key?(word) }
+  end
+
+  def find_word_placement(grid, word)
+    grid.each_with_index do |row, row_index|
+      col_index = row.join.index(word_field(word))
+      return { direction: "horizontal", start: [ row_index, col_index ] } if col_index
+    end
+    grid.transpose.each_with_index do |col, col_index|
+      row_index = col.join.index(word_field(word))
+      return { direction: "vertical", start: [ row_index, col_index ] } if row_index
+    end
+    nil
   end
 end

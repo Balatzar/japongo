@@ -201,8 +201,4 @@ class CrosswordGameInitializerServiceTest < ActiveSupport::TestCase
     placed_words = [ Word.new(romanji: "wakawakashii"), Word.new(romanji: "utsuwa") ]
     assert @service.place_word(grid, word_to_place, placed_words, all_words)
   end
-
-  test "word created by placement should be returned as clue" do
-    available_words = []
-  end
 end
