@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_09_20_060717) do
+ActiveRecord::Schema[7.2].define(version: 2024_09_20_170556) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -60,6 +60,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_20_060717) do
     t.json "clues"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "easy_mode", default: false
   end
 
   create_table "crossword_game_sessions_words", id: false, force: :cascade do |t|

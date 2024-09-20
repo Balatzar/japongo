@@ -53,7 +53,7 @@ end
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
-  
+
   # Add annotations to your models, routes, fixtures, and others
   gem "annotate"
 end

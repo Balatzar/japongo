@@ -29,10 +29,14 @@
       </table>
     </div>
 
-    <div class="flex justify-center mb-4">
+    <div class="flex justify-center mb-4 space-x-4">
       <button data-action="click->crossword-game#getHint" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
         Get Hint
       </button>
+      <%= button_to @easy_mode ? "Disable Easy Mode" : "Enable Easy Mode", 
+                    toggle_easy_mode_crossword_game_session_path(@crossword_game_session), 
+                    method: :patch, 
+                    class: "bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" %>
     </div>
 
     <%= render "shared/hiragana_keyboard" %>
@@ -46,6 +50,9 @@
             <% @crossword_game_session.clues.select { |c| c["direction"] == "horizontal" }.each do |clue| %>
               <li class="text-lg">
                 <%= @crossword_game_session.words.find { |word| word.hiragana == clue["word"]["hiragana"] }.english_meaning %>
+                <% if @easy_mode %>
+                  <span class="text-sm text-gray-500 ml-2">(<%= clue["word"]["romanji"] %>)</span>
+                <% end %>
               </li>
             <% end %>
           </ul>
@@ -56,6 +63,9 @@
             <% @crossword_game_session.clues.select { |c| c["direction"] == "vertical" }.each do |clue| %>
               <li class="text-lg">
                 <%= @crossword_game_session.words.find { |word| word.hiragana == clue["word"]["hiragana"] }.english_meaning %>
+                <% if @easy_mode %>
+                  <span class="text-sm text-gray-500 ml-2">(<%= clue["word"]["romanji"] %>)</span>
+                <% end %>
               </li>
             <% end %>
           </ul>

@@ -30,6 +30,9 @@ Rails.application.routes.draw do
 
   # Add routes for CrosswordGameSession
   resources :crossword_game_sessions, only: [ :show ] do
+    member do
+      patch :toggle_easy_mode
+    end
     collection do
       get :init
     end

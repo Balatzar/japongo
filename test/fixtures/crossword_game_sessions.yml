@@ -4,6 +4,7 @@
 #
 #  id         :bigint           not null, primary key
 #  clues      :json
+#  easy_mode  :boolean          default(FALSE)
 #  grid       :json
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
