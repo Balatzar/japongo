@@ -46,9 +46,10 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
           <h3 class="text-xl font-semibold mb-2">Across</h3>
-          <ul class="list-decimal pl-5 space-y-2">
+          <ul class="pl-5 space-y-2 list-none">
             <% @crossword_game_session.clues.select { |c| c["direction"] == "horizontal" }.each do |clue| %>
               <li class="text-lg">
+                <%= @clue_coordinates[clue["starting_index"]] %> ·
                 <%= @crossword_game_session.words.find { |word| word.hiragana == clue["word"]["hiragana"] }.english_meaning %>
                 <% if @easy_mode %>
                   <span class="text-sm text-gray-500 ml-2">(<%= clue["word"]["romanji"] %>)</span>
@@ -59,9 +60,10 @@
         </div>
         <div>
           <h3 class="text-xl font-semibold mb-2">Down</h3>
-          <ul class="list-decimal pl-5 space-y-2">
+          <ul class="pl-5 space-y-2 list-none">
             <% @crossword_game_session.clues.select { |c| c["direction"] == "vertical" }.each do |clue| %>
               <li class="text-lg">
+                <%= @clue_coordinates[clue["starting_index"]] %> ·
                 <%= @crossword_game_session.words.find { |word| word.hiragana == clue["word"]["hiragana"] }.english_meaning %>
                 <% if @easy_mode %>
                   <span class="text-sm text-gray-500 ml-2">(<%= clue["word"]["romanji"] %>)</span>
