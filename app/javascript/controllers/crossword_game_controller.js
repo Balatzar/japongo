@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["grid", "input", "message"]
+  static targets = ["grid", "input", "message", "clues"]
   static values = {
     grid: Array,
     answers: Array
@@ -11,6 +11,9 @@ export default class extends Controller {
     console.log("Crossword game controller connected")
     this.initializeGame()
     this.addHiraganaKeyboardListener()
+    this.currentWordDirection = null
+    this.currentWordStartRow = null
+    this.currentWordStartCol = null
   }
 
   initializeGame() {
@@ -33,17 +36,9 @@ export default class extends Controller {
   handleKeydown(event) {
     console.log("Keydown event:", event.key)
     if (event.key === "Backspace" && event.target.value === "") {
-      const prevInput = event.target.previousElementSibling
-      if (prevInput && prevInput.tagName === "INPUT") {
-        console.log("Moving focus to previous input")
-        prevInput.focus()
-      }
+      this.moveToPreviousInput(event.target)
     } else if (event.key.length === 1 && event.target.value !== "") {
-      const nextInput = event.target.nextElementSibling
-      if (nextInput && nextInput.tagName === "INPUT") {
-        console.log("Moving focus to next input")
-        nextInput.focus()
-      }
+      this.moveToNextInput(event.target)
     }
   }
 
@@ -70,12 +65,66 @@ export default class extends Controller {
       console.log("Grid is filled, validating")
       this.validateGrid()
     } else {
-      const nextInput = input.nextElementSibling
+      this.moveToNextInput(input)
+    }
+  }
+
+  moveToNextInput(currentInput) {
+    if (this.currentWordDirection) {
+      const nextInput = this.getNextInputInWord(currentInput)
+      if (nextInput) {
+        nextInput.focus()
+      }
+    } else {
+      const nextInput = currentInput.nextElementSibling
       if (nextInput && nextInput.tagName === "INPUT") {
-        console.log("Moving focus to next input")
         nextInput.focus()
       }
     }
+  }
+
+  moveToPreviousInput(currentInput) {
+    if (this.currentWordDirection) {
+      const prevInput = this.getPreviousInputInWord(currentInput)
+      if (prevInput) {
+        prevInput.focus()
+      }
+    } else {
+      const prevInput = currentInput.previousElementSibling
+      if (prevInput && prevInput.tagName === "INPUT") {
+        prevInput.focus()
+      }
+    }
+  }
+
+  getNextInputInWord(currentInput) {
+    const currentRow = parseInt(currentInput.dataset.row)
+    const currentCol = parseInt(currentInput.dataset.col)
+    let nextRow = currentRow
+    let nextCol = currentCol
+
+    if (this.currentWordDirection === "horizontal") {
+      nextCol++
+    } else {
+      nextRow++
+    }
+
+    return this.gridTarget.querySelector(`input[data-row="${nextRow}"][data-col="${nextCol}"]`)
+  }
+
+  getPreviousInputInWord(currentInput) {
+    const currentRow = parseInt(currentInput.dataset.row)
+    const currentCol = parseInt(currentInput.dataset.col)
+    let prevRow = currentRow
+    let prevCol = currentCol
+
+    if (this.currentWordDirection === "horizontal") {
+      prevCol--
+    } else {
+      prevRow--
+    }
+
+    return this.gridTarget.querySelector(`input[data-row="${prevRow}"][data-col="${prevCol}"]`)
   }
 
   isGridFilled() {
@@ -167,13 +216,45 @@ export default class extends Controller {
       if (this.currentInput) {
         this.currentInput.value = event.detail.character
         this.currentInput.dispatchEvent(new Event('input', { bubbles: true }))
-        
-        // Move to the next input
-        const nextInput = this.currentInput.nextElementSibling
-        if (nextInput && nextInput.tagName === "INPUT") {
-          nextInput.focus()
-        }
+        this.moveToNextInput(this.currentInput)
       }
     })
+  }
+
+  highlightClueWord(event) {
+    console.log("Highlighting clue word")
+    const clueElement = event.currentTarget
+    const word = clueElement.dataset.crosswordGameWord
+    this.currentWordDirection = clueElement.dataset.crosswordGameDirection
+    this.currentWordStartRow = parseInt(clueElement.dataset.crosswordGameStartRow)
+    this.currentWordStartCol = parseInt(clueElement.dataset.crosswordGameStartCol)
+
+    // Remove previous highlights
+    this.gridTarget.querySelectorAll('input').forEach(input => {
+      input.classList.remove('highlighted')
+    })
+
+    // Highlight the cells for the selected word
+    for (let i = 0; i < word.length; i++) {
+      let row = this.currentWordStartRow
+      let col = this.currentWordStartCol
+
+      if (this.currentWordDirection === "horizontal") {
+        col += i
+      } else {
+        row += i
+      }
+
+      const input = this.gridTarget.querySelector(`input[data-row="${row}"][data-col="${col}"]`)
+      if (input) {
+        input.classList.add('highlighted')
+      }
+    }
+
+    // Focus on the first cell of the word
+    const firstInput = this.gridTarget.querySelector(`input[data-row="${this.currentWordStartRow}"][data-col="${this.currentWordStartCol}"]`)
+    if (firstInput) {
+      firstInput.focus()
+    }
   }
 }

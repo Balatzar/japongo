@@ -48,7 +48,12 @@
           <h3 class="text-xl font-semibold mb-2">Across</h3>
           <ul class="pl-5 space-y-2 list-none">
             <% @crossword_game_session.clues.select { |c| c["direction"] == "horizontal" }.each do |clue| %>
-              <li class="text-lg">
+              <li class="text-lg cursor-pointer hover:text-blue-600"
+                  data-action="click->crossword-game#highlightClueWord"
+                  data-crossword-game-word="<%= clue["word"]["hiragana"] %>"
+                  data-crossword-game-direction="horizontal"
+                  data-crossword-game-start-row="<%= clue["starting_index"][0] %>"
+                  data-crossword-game-start-col="<%= clue["starting_index"][1] %>">
                 <%= @clue_coordinates[clue["starting_index"]] %> ·
                 <%= @crossword_game_session.words.find { |word| word.hiragana == clue["word"]["hiragana"] }.english_meaning %>
                 <% if @easy_mode %>
@@ -62,7 +67,12 @@
           <h3 class="text-xl font-semibold mb-2">Down</h3>
           <ul class="pl-5 space-y-2 list-none">
             <% @crossword_game_session.clues.select { |c| c["direction"] == "vertical" }.each do |clue| %>
-              <li class="text-lg">
+              <li class="text-lg cursor-pointer hover:text-blue-600"
+                  data-action="click->crossword-game#highlightClueWord"
+                  data-crossword-game-word="<%= clue["word"]["hiragana"] %>"
+                  data-crossword-game-direction="vertical"
+                  data-crossword-game-start-row="<%= clue["starting_index"][0] %>"
+                  data-crossword-game-start-col="<%= clue["starting_index"][1] %>">
                 <%= @clue_coordinates[clue["starting_index"]] %> ·
                 <%= @crossword_game_session.words.find { |word| word.hiragana == clue["word"]["hiragana"] }.english_meaning %>
                 <% if @easy_mode %>
@@ -85,5 +95,8 @@
   }
   input.incorrect {
     background-color: #f8d7da;
+  }
+  input.highlighted {
+    background-color: #fff3cd;
   }
 </style>
