@@ -82,5 +82,45 @@ class CrosswordGameInitializerServiceWithGridTest < ActiveSupport::TestCase
     # New word sea should be returned as a clue
     assert result[:clues].find { |clue| clue[:word] == sample_words["sea"] }, "The word 'sea' should be returned as a clue"
     # And as a placed word
-    assert_includes result[:placed_words], sample_words["sea"], "The word 'sea' should be placed in the grid"  end
+    assert_includes result[:placed_words], sample_words["sea"], "The word 'sea' should be placed in the grid"
+  end
+
+  test "clues should not have negative coordinates" do
+    existing_grid = [ [ " ", " ", " ", " ", " ", " ", "ち", " ", " " ],
+    [ " ", " ", " ", " ", " ", " ", "ゅ", " ", " " ],
+    [ " ", " ", " ", " ", "じ", " ", "う", " ", " " ],
+    [ " ", "せ", " ", " ", "ゅ", " ", "か", "た", " " ],
+    [ "い", "っ", "し", "ょ", "う", "け", "ん", "め", "い" ],
+    [ "わ", "け", " ", " ", "ふ", " ", " ", "す", " " ],
+    [ "う", "ん", " ", " ", "く", " ", " ", " ", " " ] ]
+
+    sample_words = {
+      "いっしょうけんめい" => Word.new(hiragana: "いっしょうけんめい"),
+      "ためす" => Word.new(hiragana: "ためす"),
+      "いわう" => Word.new(hiragana: "いわう"),
+      "じゅうふく" => Word.new(hiragana: "じゅうふく"),
+      "せっけん" => Word.new(hiragana: "せっけん"),
+      "ちゅうかん" => Word.new(hiragana: "ちゅうかん"),
+      "かた" => Word.new(hiragana: "かた"),
+      "わけ" => Word.new(hiragana: "わけ"),
+      "うん" => Word.new(hiragana: "うん")
+    }
+
+    service = CrosswordGameInitializerService.new(
+      word_dictionary: sample_words,
+      words: sample_words.values,
+      words_to_place: 0,
+      use_hiragana: true,
+      enable_logging: true,
+      existing_grid: existing_grid
+    )
+
+    result = service.run
+
+    result[:clues].each do |clue|
+      row, col = clue[:starting_index]
+      assert row >= 0, "Row should be non-negative"
+      assert col >= 0, "Column should be non-negative"
+    end
+  end
 end

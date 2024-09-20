@@ -32,6 +32,7 @@ class CrosswordGameInitializerService
       log "Existing words: #{existing_words.inspect}"
       placed_words.concat(existing_words)
       existing_words.each do |word|
+        log "Finding placement for #{word_field(word)}"
         word_placements[word] = find_word_placement(grid, word)
       end
     else
@@ -50,7 +51,10 @@ class CrosswordGameInitializerService
       word_to_place = @word_placement.find_intersecting_word(words - placed_words, placed_words)
       break unless word_to_place
       log "word_to_place: #{word_field(word_to_place).inspect}"
-      break if i > maximum
+      if i > maximum
+        log "Maximum iterations reached"
+        break
+      end
       i += 1
 
       placement = @word_placement.place_word(grid, word_to_place, placed_words, words)
