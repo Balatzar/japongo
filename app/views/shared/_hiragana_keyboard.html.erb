@@ -1,18 +1,38 @@
 <div data-controller="hiragana-keyboard" class="hiragana-keyboard">
-  <% hiragana = %w[あ い う え お か き く け こ さ し す せ そ た ち つ て と な に ぬ ね の は ひ ふ へ ほ ま み む め も や ゆ よ ら り る れ ろ わ を ん] %>
-  <% hiragana.each do |char| %>
-    <button type="button" class="hiragana-key" data-action="click->hiragana-keyboard#inputHiragana" data-hiragana-keyboard-target="key" data-character="<%= char %>">
-      <%= char %>
-    </button>
+  <% hiragana = [
+    ["あ", "い", "う", "え", "お", "か", "き", "く", "け", "こ"],
+    ["さ", "し", "す", "せ", "そ", "た", "ち", "つ", "て", "と"],
+    ["な", "に", "ぬ", "ね", "の", "は", "ひ", "ふ", "へ", "ほ"],
+    ["ま", "み", "む", "め", "も", "や", "ゆ", "よ", "ら", "り"],
+    ["る", "れ", "ろ", "わ", "を", "ん"],
+  ] %>
+  <% dakuon = [
+    ["が", "ぎ", "ぐ", "げ", "ご", "ざ", "じ", "ず", "ぜ", "ぞ"],
+    ["だ", "ぢ", "づ", "で", "ど", "ば", "び", "ぶ", "べ", "ぼ"],
+  ] %>
+
+  <% (hiragana + dakuon).each do |row| %>
+    <div class="hiragana-row">
+      <% row.each do |char| %>
+        <button type="button" class="hiragana-key <%= 'dakuon' if dakuon.flatten.include?(char) %>" data-action="click->hiragana-keyboard#inputHiragana" data-hiragana-keyboard-target="key" data-character="<%= char %>">
+          <%= char %>
+        </button>
+      <% end %>
+    </div>
   <% end %>
 </div>
 
 <style>
   .hiragana-keyboard {
-    display: grid;
-    grid-template-columns: repeat(10, 1fr);
+    display: flex;
+    flex-direction: column;
     gap: 5px;
     margin-top: 20px;
+  }
+  .hiragana-row {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
   }
   .hiragana-key {
     padding: 5px;
@@ -20,8 +40,15 @@
     border: 1px solid #ccc;
     background-color: #f8f8f8;
     cursor: pointer;
+    min-width: 30px;
   }
   .hiragana-key:hover {
     background-color: #e8e8e8;
+  }
+  .hiragana-key.dakuon {
+    background-color: #e6f2ff;
+  }
+  .hiragana-key.dakuon:hover {
+    background-color: #ccebff;
   }
 </style>
