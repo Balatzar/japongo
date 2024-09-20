@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_09_20_000005) do
+ActiveRecord::Schema[7.2].define(version: 2024_09_20_060717) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -53,6 +53,20 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_20_000005) do
     t.bigint "building_block_id", null: false
     t.index ["building_block_id", "hiragana_id"], name: "idx_on_building_block_id_hiragana_id_e134e9fb94"
     t.index ["hiragana_id", "building_block_id"], name: "idx_on_hiragana_id_building_block_id_27eb2f5085"
+  end
+
+  create_table "crossword_game_sessions", force: :cascade do |t|
+    t.json "grid"
+    t.json "clues"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "crossword_game_sessions_words", id: false, force: :cascade do |t|
+    t.bigint "crossword_game_session_id", null: false
+    t.bigint "word_id", null: false
+    t.index ["crossword_game_session_id", "word_id"], name: "idx_on_crossword_game_session_id_word_id_a76196a1d8"
+    t.index ["word_id", "crossword_game_session_id"], name: "idx_on_word_id_crossword_game_session_id_3ae811a66d"
   end
 
   create_table "hiraganas", force: :cascade do |t|
