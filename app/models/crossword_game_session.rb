@@ -10,4 +10,15 @@
 #
 class CrosswordGameSession < ApplicationRecord
   has_and_belongs_to_many :words
+
+  before_create :initialize_game
+
+  private
+
+  def initialize_game
+    game_data = CrosswordGameInitializerService.initialize_game
+    self.grid = game_data[:grid]
+    self.clues = game_data[:clues]
+    self.words = game_data[:placed_words]
+  end
 end
