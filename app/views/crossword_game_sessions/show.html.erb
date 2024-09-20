@@ -11,7 +11,7 @@
                 <% else %>
                   <div class="w-full h-full bg-white relative">
                     <% if cell != " " %>
-                      <span class="absolute top-0 left-0 text-xs"><%= cell %></span>
+                      <span class="absolute top-0 left-0 text-xs"><%= @clue_coordinates[[row_index, col_index]] %></span>
                     <% end %>
                     <input type="text" maxlength="1" class="w-full h-full text-center focus:outline-none" data-row="<%= row_index %>" data-col="<%= col_index %>">
                   </div>
@@ -31,7 +31,6 @@
           <ul class="list-decimal pl-5">
             <% @crossword_game_session.clues.select { |c| c["direction"] == "horizontal" }.each do |clue| %>
               <li>
-                <%= clue["starting_index"].join(", ") %>: 
                 <%= @crossword_game_session.words.find { |word| word.hiragana == clue["word"]["hiragana"] }.english_meaning %>
               </li>
             <% end %>
@@ -42,7 +41,6 @@
           <ul class="list-decimal pl-5">
             <% @crossword_game_session.clues.select { |c| c["direction"] == "vertical" }.each do |clue| %>
               <li>
-                <%= clue["starting_index"].join(", ") %>: 
                 <%= @crossword_game_session.words.find { |word| word.hiragana == clue["word"]["hiragana"] }.english_meaning %>
               </li>
             <% end %>

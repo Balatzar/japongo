@@ -17,7 +17,7 @@ class CrosswordGameInitializerService
     @grid_initializer = GridInitializerService.new(enable_logging: enable_logging)
     @grid_validation = GridValidationService.new(@word_dictionary, enable_logging: enable_logging)
     @word_placement = WordPlacementService.new(use_hiragana: use_hiragana, enable_logging: enable_logging, grid_validation: @grid_validation)
-    @clue_generator = ClueGeneratorService.new(use_hiragana: use_hiragana)
+    @clue_generator = ClueGeneratorService.new
   end
 
   def run
@@ -81,7 +81,7 @@ class CrosswordGameInitializerService
       end
     end
 
-    clues = @clue_generator.generate_clues(placed_words, word_placements, cleaned_grid, cleaned_grid)
+    clues = @clue_generator.generate_clues(placed_words, word_placements, grid, cleaned_grid)
 
     {
       placed_words: placed_words,

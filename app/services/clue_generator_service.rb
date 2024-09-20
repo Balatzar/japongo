@@ -1,6 +1,5 @@
 class ClueGeneratorService
-  def initialize(use_hiragana: true)
-    @use_hiragana = use_hiragana
+  def initialize
   end
 
   def generate_clues(placed_words, word_placements, original_grid, cleaned_grid)
@@ -21,11 +20,5 @@ class ClueGeneratorService
         starting_index: cleaned_start
       }
     end
-  end
-
-  private
-
-  def word_field(word)
-    @use_hiragana ? word.hiragana : word.romanji
   end
 end
