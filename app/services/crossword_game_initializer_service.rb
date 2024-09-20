@@ -1,10 +1,11 @@
 class CrosswordGameInitializerService
   GRID_SIZE = 30
 
-  attr_reader :word_dictionary, :words, :words_to_place, :use_hiragana
+  attr_reader :word_dictionary, :words, :words_to_place, :use_hiragana, :enable_logging
 
-  def initialize(word_dictionary: nil, words: nil, words_to_place: 10, use_hiragana: true)
+  def initialize(word_dictionary: nil, words: nil, words_to_place: 10, use_hiragana: true, enable_logging: false)
     @use_hiragana = use_hiragana
+    @enable_logging = enable_logging
     @word_dictionary = word_dictionary || Word.all.index_by { |word| word_field(word) }
     @words = words || Word.all.sample(2_000)
     @words_to_place = words_to_place
@@ -12,7 +13,7 @@ class CrosswordGameInitializerService
 
   def run
     biggest_word = words.max_by { |word| word_field(word).length }
-    pp "biggest_word: #{word_field(biggest_word).inspect}"
+    log "biggest_word: #{word_field(biggest_word).inspect}"
     grid = initialize_grid
     placed_words = []
     word_placements = {}
@@ -20,33 +21,33 @@ class CrosswordGameInitializerService
     start_row, start_col = place_biggest_word(grid, biggest_word)
     placed_words << biggest_word
     word_placements[biggest_word] = { direction: "horizontal", start: [ start_row, start_col ] }
-    pp grid
+    log grid
 
     maximum = 1_000
     i = 0
 
     while placed_words.size < words_to_place
       word_to_place = find_intersecting_word(words - placed_words, placed_words)
-      pp "word_to_place: #{word_field(word_to_place).inspect}"
+      log "word_to_place: #{word_field(word_to_place).inspect}"
       break unless word_to_place
       break if i > maximum
       i += 1
 
       placement = place_word(grid, word_to_place, placed_words, words)
       if placement
-        pp "Word has been placed"
-        pp grid
+        log "Word has been placed"
+        log grid
         placed_words << word_to_place
         word_placements[word_to_place] = placement
       end
     end
 
-    pp "Original grid:"
+    log "Original grid:"
     print_grid(grid)
 
     cleaned_grid = clean_grid(grid)
 
-    pp "Cleaned grid:"
+    log "Cleaned grid:"
     print_grid(cleaned_grid)
 
     clues = generate_clues(placed_words, word_placements, grid, cleaned_grid)
@@ -73,7 +74,9 @@ class CrosswordGameInitializerService
     true
   end
 
-  private
+  def log(message)
+    pp message if @enable_logging
+  end
 
   def word_field(word)
     use_hiragana ? word.hiragana : word.romanji
@@ -83,7 +86,7 @@ class CrosswordGameInitializerService
     line.split(" ").each do |word_candidate|
       next if word_candidate.length <= 1
       unless word_dictionary.key?(word_candidate)
-        pp "Word not found: #{word_candidate.inspect}"
+        log "Word not found: #{word_candidate.inspect}"
         return false
       end
     end
@@ -116,17 +119,17 @@ class CrosswordGameInitializerService
   def place_word(grid, word, placed_words, words)
     placed_chars = placed_words.flat_map { |w| word_field(w).chars }.uniq
     common_chars = word_field(word).chars & placed_chars
-    pp "common_chars: #{common_chars.inspect}"
+    log "common_chars: #{common_chars.inspect}"
 
     common_chars.each do |common_char|
       word_index = word_field(word).index(common_char)
-      pp "word_index: #{word_index.inspect}"
+      log "word_index: #{word_index.inspect}"
 
       grid.length.times do |row|
         grid.length.times do |col|
           if grid[row][col] == common_char
-            pp "common_char: #{common_char.inspect}"
-            pp "row: #{row.inspect}, col: #{col.inspect}"
+            log "common_char: #{common_char.inspect}"
+            log "row: #{row.inspect}, col: #{col.inspect}"
             if can_place_horizontally?(grid, word, row, col - word_index)
               place_horizontally(grid, word, row, col - word_index)
               if check_grid(grid)
@@ -136,13 +139,13 @@ class CrosswordGameInitializerService
                 words.delete(word)
               end
             elsif can_place_vertically?(grid, word, row - word_index, col)
-              pp "We can place vertically"
+              log "We can place vertically"
               place_vertically(grid, word, row - word_index, col)
               if check_grid(grid)
                 return { direction: "vertical", start: [ row - word_index, col ] }
               else
-                pp "The grid was invalid"
-                pp grid
+                log "The grid was invalid"
+                log grid
                 remove_vertically(grid, word, row - word_index, col, row)
                 words.delete(word)
               end
@@ -202,8 +205,8 @@ class CrosswordGameInitializerService
   end
 
   def clean_grid(grid)
-    pp "Cleaning grid..."
-    pp "Original grid size: #{grid.size}x#{grid[0].size}"
+    log "Cleaning grid..."
+    log "Original grid size: #{grid.size}x#{grid[0].size}"
 
     # Find the first and last non-empty rows
     first_non_empty_row = grid.index { |row| row.any? { |cell| cell != " " } }
@@ -219,14 +222,14 @@ class CrosswordGameInitializerService
       row[first_non_empty_col..last_non_empty_col]
     end
 
-    pp "Cleaned grid size: #{cleaned_grid.size}x#{cleaned_grid[0].size}"
+    log "Cleaned grid size: #{cleaned_grid.size}x#{cleaned_grid[0].size}"
 
     cleaned_grid
   end
 
   def print_grid(grid)
     grid.each do |row|
-      puts row.map { |cell| cell == " " ? "." : cell }.join
+      log row.map { |cell| cell == " " ? "." : cell }.join
     end
   end
 
