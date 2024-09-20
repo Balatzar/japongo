@@ -15,7 +15,7 @@ class CrosswordGameInitializerService
 
     start_row, start_col = place_biggest_word(grid, biggest_word)
     placed_words << biggest_word
-    word_placements[biggest_word] = { direction: "horizontal", start: [start_row, start_col] }
+    word_placements[biggest_word] = { direction: "horizontal", start: [ start_row, start_col ] }
     pp grid
 
     maximum = 50
@@ -48,7 +48,6 @@ class CrosswordGameInitializerService
     clues = generate_clues(placed_words, word_placements, grid, cleaned_grid)
 
     {
-      words: words,
       placed_words: placed_words,
       grid: cleaned_grid,
       clues: clues
@@ -96,7 +95,7 @@ class CrosswordGameInitializerService
       grid[start_row][start_col + index] = char
     end
 
-    [start_row, start_col]
+    [ start_row, start_col ]
   end
 
   def self.find_intersecting_word(words, placed_words)
@@ -123,7 +122,7 @@ class CrosswordGameInitializerService
             if can_place_horizontally?(grid, word, row, col - word_index)
               place_horizontally(grid, word, row, col - word_index)
               if check_grid(grid)
-                return { direction: "horizontal", start: [row, col - word_index] }
+                return { direction: "horizontal", start: [ row, col - word_index ] }
               else
                 remove_horizontally(grid, word, row, col - word_index, col)
                 words.delete(word)
@@ -132,7 +131,7 @@ class CrosswordGameInitializerService
               pp "We can place vertically"
               place_vertically(grid, word, row - word_index, col)
               if check_grid(grid)
-                return { direction: "vertical", start: [row - word_index, col] }
+                return { direction: "vertical", start: [ row - word_index, col ] }
               else
                 pp "The grid was invalid"
                 pp grid
