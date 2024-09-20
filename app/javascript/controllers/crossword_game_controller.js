@@ -10,6 +10,7 @@ export default class extends Controller {
   connect() {
     console.log("Crossword game controller connected")
     this.initializeGame()
+    this.addHiraganaKeyboardListener()
   }
 
   initializeGame() {
@@ -23,7 +24,7 @@ export default class extends Controller {
     console.log("Updating input fields")
     const inputs = this.gridTarget.querySelectorAll('input')
     inputs.forEach((input, index) => {
-      input.dataset.action = "input->crossword-game#checkInput keydown->crossword-game#handleKeydown"
+      input.dataset.action = "input->crossword-game#checkInput keydown->crossword-game#handleKeydown focus->crossword-game#handleFocus"
       input.dataset.index = index
     })
     console.log("Input fields updated")
@@ -46,6 +47,10 @@ export default class extends Controller {
     }
   }
 
+  handleFocus(event) {
+    this.currentInput = event.target
+  }
+
   checkInput(event) {
     const input = event.target
     const row = parseInt(input.dataset.row)
@@ -64,6 +69,12 @@ export default class extends Controller {
     if (this.isGridFilled()) {
       console.log("Grid is filled, validating")
       this.validateGrid()
+    } else {
+      const nextInput = input.nextElementSibling
+      if (nextInput && nextInput.tagName === "INPUT") {
+        console.log("Moving focus to next input")
+        nextInput.focus()
+      }
     }
   }
 
@@ -149,5 +160,20 @@ export default class extends Controller {
       const col = parseInt(input.dataset.col)
       return this.gridValue[row][col] !== " " && input.value === ""
     }).map(input => ({ input, row: parseInt(input.dataset.row), col: parseInt(input.dataset.col) }))
+  }
+
+  addHiraganaKeyboardListener() {
+    document.addEventListener("hiragana-keyboard:input", (event) => {
+      if (this.currentInput) {
+        this.currentInput.value = event.detail.character
+        this.currentInput.dispatchEvent(new Event('input', { bubbles: true }))
+        
+        // Move to the next input
+        const nextInput = this.currentInput.nextElementSibling
+        if (nextInput && nextInput.tagName === "INPUT") {
+          nextInput.focus()
+        }
+      }
+    })
   }
 }

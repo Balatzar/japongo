@@ -1,0 +1,27 @@
+<div data-controller="hiragana-keyboard" class="hiragana-keyboard">
+  <% hiragana = %w[あ い う え お か き く け こ さ し す せ そ た ち つ て と な に ぬ ね の は ひ ふ へ ほ ま み む め も や ゆ よ ら り る れ ろ わ を ん] %>
+  <% hiragana.each do |char| %>
+    <button type="button" class="hiragana-key" data-action="click->hiragana-keyboard#inputHiragana" data-hiragana-keyboard-target="key" data-character="<%= char %>">
+      <%= char %>
+    </button>
+  <% end %>
+</div>
+
+<style>
+  .hiragana-keyboard {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 5px;
+    margin-top: 20px;
+  }
+  .hiragana-key {
+    padding: 5px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    background-color: #f8f8f8;
+    cursor: pointer;
+  }
+  .hiragana-key:hover {
+    background-color: #e8e8e8;
+  }
+</style>
