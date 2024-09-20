@@ -1,17 +1,18 @@
 class CrosswordGameInitializerService
   GRID_SIZE = 30
 
-  attr_reader :word_dictionary, :words, :words_to_place
+  attr_reader :word_dictionary, :words, :words_to_place, :use_hiragana
 
-  def initialize(word_dictionary: Word.all.index_by(&:hiragana), words: word_dictionary.values.sample(2_000), words_to_place: 10)
-    @word_dictionary = word_dictionary
-    @words = words
+  def initialize(word_dictionary: nil, words: nil, words_to_place: 10, use_hiragana: true)
+    @use_hiragana = use_hiragana
+    @word_dictionary = word_dictionary || Word.all.index_by { |word| word_field(word) }
+    @words = words || Word.all.sample(2_000)
     @words_to_place = words_to_place
   end
 
   def run
-    biggest_word = words.max_by { |word| word.hiragana.length }
-    pp "biggest_word: #{biggest_word.hiragana.inspect}"
+    biggest_word = words.max_by { |word| word_field(word).length }
+    pp "biggest_word: #{word_field(biggest_word).inspect}"
     grid = initialize_grid
     placed_words = []
     word_placements = {}
@@ -26,7 +27,7 @@ class CrosswordGameInitializerService
 
     while placed_words.size < words_to_place
       word_to_place = find_intersecting_word(words - placed_words, placed_words)
-      pp "word_to_place: #{word_to_place.hiragana.inspect}"
+      pp "word_to_place: #{word_field(word_to_place).inspect}"
       break unless word_to_place
       break if i > maximum
       i += 1
@@ -74,6 +75,10 @@ class CrosswordGameInitializerService
 
   private
 
+  def word_field(word)
+    use_hiragana ? word.hiragana : word.romanji
+  end
+
   def check_words_in_line(line)
     line.split(" ").each do |word_candidate|
       next if word_candidate.length <= 1
@@ -90,11 +95,11 @@ class CrosswordGameInitializerService
   end
 
   def place_biggest_word(grid, word)
-    word_length = word.hiragana.length
+    word_length = word_field(word).length
     start_row = grid.length / 2
     start_col = (grid.length - word_length) / 2
 
-    word.hiragana.each_char.with_index do |char, index|
+    word_field(word).each_char.with_index do |char, index|
       grid[start_row][start_col + index] = char
     end
 
@@ -102,19 +107,19 @@ class CrosswordGameInitializerService
   end
 
   def find_intersecting_word(words, placed_words)
-    placed_chars = placed_words.flat_map { |word| word.hiragana.chars }.uniq
+    placed_chars = placed_words.flat_map { |word| word_field(word).chars }.uniq
     words.find do |word|
-      (word.hiragana.chars & placed_chars).any?
+      (word_field(word).chars & placed_chars).any?
     end
   end
 
   def place_word(grid, word, placed_words, words)
-    placed_chars = placed_words.flat_map { |w| w.hiragana.chars }.uniq
-    common_chars = word.hiragana.chars & placed_chars
+    placed_chars = placed_words.flat_map { |w| word_field(w).chars }.uniq
+    common_chars = word_field(word).chars & placed_chars
     pp "common_chars: #{common_chars.inspect}"
 
     common_chars.each do |common_char|
-      word_index = word.hiragana.index(common_char)
+      word_index = word_field(word).index(common_char)
       pp "word_index: #{word_index.inspect}"
 
       grid.length.times do |row|
@@ -151,9 +156,9 @@ class CrosswordGameInitializerService
   end
 
   def can_place_horizontally?(grid, word, row, start_col)
-    return false if start_col < 0 || start_col + word.hiragana.length > grid.length
+    return false if start_col < 0 || start_col + word_field(word).length > grid.length
 
-    word.hiragana.each_char.with_index do |char, index|
+    word_field(word).each_char.with_index do |char, index|
       col = start_col + index
       return false if grid[row][col] != " " && grid[row][col] != char
     end
@@ -162,9 +167,9 @@ class CrosswordGameInitializerService
   end
 
   def can_place_vertically?(grid, word, start_row, col)
-    return false if start_row < 0 || start_row + word.hiragana.length > grid.length
+    return false if start_row < 0 || start_row + word_field(word).length > grid.length
 
-    word.hiragana.each_char.with_index do |char, index|
+    word_field(word).each_char.with_index do |char, index|
       row = start_row + index
       return false if grid[row][col] != " " && grid[row][col] != char
     end
@@ -173,25 +178,25 @@ class CrosswordGameInitializerService
   end
 
   def place_horizontally(grid, word, row, start_col)
-    word.hiragana.each_char.with_index do |char, index|
+    word_field(word).each_char.with_index do |char, index|
       grid[row][start_col + index] = char
     end
   end
 
   def place_vertically(grid, word, start_row, col)
-    word.hiragana.each_char.with_index do |char, index|
+    word_field(word).each_char.with_index do |char, index|
       grid[start_row + index][col] = char
     end
   end
 
   def remove_horizontally(grid, word, row, start_col, initial_col)
-    word.hiragana.length.times do |index|
+    word_field(word).length.times do |index|
       grid[row][start_col + index] = " " unless start_col + index == initial_col # Don't remove the intersecting character
     end
   end
 
   def remove_vertically(grid, word, start_row, col, initial_row)
-    word.hiragana.length.times do |index|
+    word_field(word).length.times do |index|
       grid[start_row + index][col] = " " unless start_row + index == initial_row # Don't remove the intersecting character
     end
   end
@@ -238,7 +243,7 @@ class CrosswordGameInitializerService
       ]
 
       {
-        word: word.hiragana,
+        word: word_field(word),
         direction: placement[:direction],
         starting_index: cleaned_start
       }

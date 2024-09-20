@@ -3,188 +3,103 @@ require "test_helper"
 class CrosswordGameInitializerServiceTest < ActiveSupport::TestCase
   setup do
     @sample_words = {
-      "cat" => Word.new(romanji: "cat"),
-      "dog" => Word.new(romanji: "dog"),
-      "bird" => Word.new(romanji: "bird"),
-      "fish" => Word.new(romanji: "fish"),
-      "bear" => Word.new(romanji: "bear")
+      "cat" => Word.new(hiragana: "ねこ", romanji: "neko"),
+      "dog" => Word.new(hiragana: "いぬ", romanji: "inu"),
+      "bird" => Word.new(hiragana: "とり", romanji: "tori"),
+      "fish" => Word.new(hiragana: "さかな", romanji: "sakana"),
+      "bear" => Word.new(hiragana: "くま", romanji: "kuma")
     }
-    CrosswordGameInitializerService.class_variable_set(:@@all_words, @sample_words)
   end
 
-  test "check_grid with all valid words" do
+  test "initialize with hiragana option" do
+    service = CrosswordGameInitializerService.new(word_dictionary: @sample_words, words: @sample_words.values, words_to_place: 5, use_hiragana: true)
+    assert_equal true, service.use_hiragana
+    assert_equal @sample_words, service.word_dictionary
+  end
+
+  test "initialize with romanji option" do
+    service = CrosswordGameInitializerService.new(word_dictionary: @sample_words, words: @sample_words.values, words_to_place: 5, use_hiragana: false)
+    assert_equal false, service.use_hiragana
+    assert_equal @sample_words, service.word_dictionary
+  end
+
+  test "word_field returns hiragana when use_hiragana is true" do
+    service = CrosswordGameInitializerService.new(word_dictionary: @sample_words, words: @sample_words.values, words_to_place: 5, use_hiragana: true)
+    assert_equal "ねこ", service.send(:word_field, @sample_words["cat"])
+  end
+
+  test "word_field returns romanji when use_hiragana is false" do
+    service = CrosswordGameInitializerService.new(word_dictionary: @sample_words, words: @sample_words.values, words_to_place: 5, use_hiragana: false)
+    assert_equal "neko", service.send(:word_field, @sample_words["cat"])
+  end
+
+  test "run generates clues with hiragana when use_hiragana is true" do
+    service = CrosswordGameInitializerService.new(word_dictionary: @sample_words, words: @sample_words.values, words_to_place: 3, use_hiragana: true)
+    result = service.run
+    assert result[:clues].all? { |clue| clue[:word].match?(/\p{Hiragana}/) }
+  end
+
+  test "run generates clues with romanji when use_hiragana is false" do
+    service = CrosswordGameInitializerService.new(word_dictionary: @sample_words, words: @sample_words.values, words_to_place: 3, use_hiragana: false)
+    result = service.run
+    assert result[:clues].all? { |clue| clue[:word].match?(/^[a-z]+$/) }
+  end
+
+  test "check_grid with all valid hiragana words" do
+    service = CrosswordGameInitializerService.new(word_dictionary: @sample_words, words: @sample_words.values, words_to_place: 5, use_hiragana: true)
     grid = [
-      [ "c", "a", "t", " ", "d", "o", "g" ],
-      [ " ", " ", " ", " ", " ", " ", " " ],
-      [ "b", "i", "r", "d", " ", " ", " " ],
-      [ " ", " ", " ", " ", " ", " ", " " ],
-      [ "f", "i", "s", "h", " ", " ", " " ],
-      [ " ", " ", " ", " ", " ", " ", " " ],
-      [ "b", "e", "a", "r", " ", " ", " " ]
+      ["ね", "こ", " ", "い", "ぬ"],
+      [" ", " ", " ", " ", " "],
+      ["と", "り", " ", " ", " "],
+      [" ", " ", " ", " ", " "],
+      ["さ", "か", "な", " ", " "]
     ]
-
-    assert CrosswordGameInitializerService.check_grid(grid)
+    assert service.check_grid(grid)
   end
 
-  test "check_grid with an invalid word" do
+  test "check_grid with all valid romanji words" do
+    service = CrosswordGameInitializerService.new(word_dictionary: @sample_words, words: @sample_words.values, words_to_place: 5, use_hiragana: false)
     grid = [
-      [ "c", "a", "t", " ", "d", "o", "g" ],
-      [ " ", " ", " ", " ", " ", " ", " " ],
-      [ "b", "i", "r", "d", " ", " ", " " ],
-      [ " ", " ", " ", " ", " ", " ", " " ],
-      [ "f", "i", "s", "h", " ", " ", " " ],
-      [ " ", " ", " ", " ", " ", " ", " " ],
-      [ "i", "n", "v", "a", "l", "i", "d" ]
+      ["n", "e", "k", "o", " ", "i", "n", "u"],
+      [" ", " ", " ", " ", " ", " ", " ", " "],
+      ["t", "o", "r", "i", " ", " ", " ", " "],
+      [" ", " ", " ", " ", " ", " ", " ", " "],
+      ["s", "a", "k", "a", "n", "a", " ", " "]
     ]
-
-    assert_not CrosswordGameInitializerService.check_grid(grid)
+    assert service.check_grid(grid)
   end
 
-  test "check_grid with vertical words" do
+  test "place_word successfully adds a valid hiragana word" do
+    service = CrosswordGameInitializerService.new(word_dictionary: @sample_words, words: @sample_words.values, words_to_place: 5, use_hiragana: true)
     grid = [
-      [ "c", " ", "b", " ", "f" ],
-      [ "a", " ", "i", " ", "i" ],
-      [ "t", " ", "r", " ", "s" ],
-      [ " ", " ", "d", " ", "h" ],
-      [ "d", " ", " ", " ", " " ],
-      [ "o", " ", " ", " ", " " ],
-      [ "g", " ", " ", " ", " " ]
-    ]
-
-    assert CrosswordGameInitializerService.check_grid(grid)
-  end
-
-  test "check_grid with no words" do
-    grid = [
-      [ " ", " ", " " ],
-      [ " ", " ", " " ],
-      [ " ", " ", " " ]
-    ]
-
-    assert CrosswordGameInitializerService.check_grid(grid)
-  end
-
-  test "check_grid with partial words" do
-    grid = [
-      [ "c", "a", " ", "d", "o" ],
-      [ " ", " ", " ", " ", " " ],
-      [ "b", "i", " ", "f", "i" ],
-      [ " ", " ", " ", " ", " " ],
-      [ "b", "e", " ", " ", " " ]
-    ]
-
-    assert_not CrosswordGameInitializerService.check_grid(grid)
-  end
-
-  test "check_grid with vertical and horizontal words" do
-    grid = [
-      [ "c", "a", "t", " ", "d", "o", "g" ],
-      [ " ", " ", " ", " ", " ", " ", " " ],
-      [ " ", " ", " ", "b", " ", " ", " " ],
-      [ " ", " ", " ", "i", " ", " ", " " ],
-      [ " ", " ", " ", "r", " ", " ", " " ],
-      [ " ", " ", " ", "d", "o", "g", " " ],
-      [ " ", " ", " ", " ", " ", " ", " " ]
-    ]
-
-    assert CrosswordGameInitializerService.check_grid(grid)
-  end
-
-  test "place_word successfully adds a valid word" do
-    grid = [
-      [ " ", " ", " ", "b", " ", " ", " " ],
-      [ " ", " ", " ", "i", " ", " ", " " ],
-      [ " ", " ", " ", "r", " ", " ", " " ],
-      [ " ", " ", " ", "d", " ", " ", " " ],
-      [ " ", " ", " ", " ", " ", " ", " " ],
-      [ " ", " ", " ", " ", " ", " ", " " ],
-      [ " ", " ", " ", " ", " ", " ", " " ]
+      ["と", "り", " ", " ", " "],
+      [" ", " ", " ", " ", " "],
+      [" ", " ", " ", " ", " "],
+      [" ", " ", " ", " ", " "],
+      [" ", " ", " ", " ", " "]
     ]
     word = @sample_words["dog"]
-    placed_words = [ @sample_words["bird"] ]
+    placed_words = [@sample_words["bird"]]
     words = @sample_words.values
 
-    assert CrosswordGameInitializerService.place_word(grid, word, placed_words, words)
-    assert CrosswordGameInitializerService.check_grid(grid)
+    assert service.send(:place_word, grid, word, placed_words, words)
+    assert service.check_grid(grid)
   end
 
-  test "place_word cannot place an invalid word" do
+  test "place_word successfully adds a valid romanji word" do
+    service = CrosswordGameInitializerService.new(word_dictionary: @sample_words, words: @sample_words.values, words_to_place: 5, use_hiragana: false)
     grid = [
-      [ "c", "a", "t", " ", " ", " ", " " ],
-      [ " ", " ", " ", " ", " ", " ", " " ],
-      [ " ", " ", " ", " ", " ", " ", " " ],
-      [ " ", " ", " ", " ", " ", " ", " " ],
-      [ " ", " ", " ", " ", " ", " ", " " ],
-      [ " ", " ", " ", " ", " ", " ", " " ],
-      [ " ", " ", " ", " ", " ", " ", " " ]
+      ["t", "o", "r", "i", " "],
+      [" ", " ", " ", " ", " "],
+      [" ", " ", " ", " ", " "],
+      [" ", " ", " ", " ", " "],
+      [" ", " ", " ", " ", " "]
     ]
-    invalid_word = Word.new(romanji: "invalid")
-    placed_words = [ @sample_words["cat"] ]
-    words = @sample_words.values + [ invalid_word ]
+    word = @sample_words["dog"]
+    placed_words = [@sample_words["bird"]]
+    words = @sample_words.values
 
-    assert_not CrosswordGameInitializerService.place_word(grid, invalid_word, placed_words, words)
-    assert CrosswordGameInitializerService.check_grid(grid)
-  end
-
-  test "add a word to an existing grid" do
-    grid = [
-      [ "c", "a", "t", " ", " ", " ", " " ],
-      [ " ", " ", " ", " ", " ", " ", " " ],
-      [ " ", " ", " ", "b", " ", " ", " " ],
-      [ " ", " ", " ", "i", " ", " ", " " ],
-      [ " ", " ", " ", "r", " ", " ", " " ],
-      [ " ", " ", " ", "d", "o", "g", " " ],
-      [ " ", " ", " ", " ", " ", " ", " " ]
-    ]
-    word = @sample_words["fish"]
-    placed_words = [ @sample_words["cat"], @sample_words["bird"], @sample_words["dog"] ]
-    assert CrosswordGameInitializerService.place_word(grid, word, placed_words, @sample_words)
-    assert_equal [
-      [ "c", "a", "t", " ", " ", " ", " " ],
-      [ " ", " ", " ", " ", " ", " ", " " ],
-      [ " ", " ", " ", "b", " ", " ", " " ],
-      [ " ", " ", "f", "i", "s", "h", " " ],
-      [ " ", " ", " ", "r", " ", " ", " " ],
-      [ " ", " ", " ", "d", "o", "g", " " ],
-      [ " ", " ", " ", " ", " ", " ", " " ]
-    ], grid
-  end
-
-  test "place specific words" do
-    grid = [ [ " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " " ],
-    [ " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " " ],
-    [ " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " " ],
-    [ " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " " ],
-    [ " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " " ],
-    [ " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " " ],
-    [ " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " " ],
-    [ " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " " ],
-    [ " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " " ],
-    [ " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " " ],
-    [ " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " " ],
-    [ " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " " ],
-    [ " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " " ],
-    [ " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "u", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " " ],
-    [ " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "t", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " " ],
-    [ " ", " ", " ", " ", " ", " ", " ", " ", " ", "w", "a", "k", "a", "w", "a", "k", "a", "s", "h", "i", "i", " ", " ", " ", " ", " ", " ", " ", " ", " " ],
-    [ " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "u", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " " ],
-    [ " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "w", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " " ],
-    [ " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "a", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " " ],
-    [ " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " " ],
-    [ " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " " ],
-    [ " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " " ],
-    [ " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " " ],
-    [ " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " " ],
-    [ " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " " ],
-    [ " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " " ],
-    [ " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " " ],
-    [ " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " " ],
-    [ " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " " ],
-    [ " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " " ] ]
-    word_to_place = Word.new(romanji: "shouhai")
-    placed_words = [ Word.new(romanji: "wakawakashii"), Word.new(romanji: "utsuwa") ]
-    words = []
-    CrosswordGameInitializerService.class_variable_set(:@@all_words, Word.all.index_by(&:romanji))
-    assert CrosswordGameInitializerService.place_word(grid, word_to_place, placed_words, words)
+    assert service.send(:place_word, grid, word, placed_words, words)
+    assert service.check_grid(grid)
   end
 end

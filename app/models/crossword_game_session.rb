@@ -16,7 +16,7 @@ class CrosswordGameSession < ApplicationRecord
   private
 
   def initialize_game
-    game_data = CrosswordGameInitializerService.initialize_game
+    game_data = CrosswordGameInitializerService.new.run
     self.grid = game_data[:grid]
     self.clues = game_data[:clues]
     self.words = game_data[:placed_words]
