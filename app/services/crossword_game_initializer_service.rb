@@ -131,10 +131,14 @@ class CrosswordGameInitializerService
             log "common_char: #{common_char.inspect}"
             log "row: #{row.inspect}, col: #{col.inspect}"
             if can_place_horizontally?(grid, word, row, col - word_index)
+              log "We can place horizontally"
               place_horizontally(grid, word, row, col - word_index)
               if check_grid(grid)
+                log "The grid was valid"
                 return { direction: "horizontal", start: [ row, col - word_index ] }
               else
+                log "The grid was invalid"
+                log grid
                 remove_horizontally(grid, word, row, col - word_index, col)
                 words.delete(word)
               end
@@ -142,6 +146,7 @@ class CrosswordGameInitializerService
               log "We can place vertically"
               place_vertically(grid, word, row - word_index, col)
               if check_grid(grid)
+                log "The grid was valid"
                 return { direction: "vertical", start: [ row - word_index, col ] }
               else
                 log "The grid was invalid"
