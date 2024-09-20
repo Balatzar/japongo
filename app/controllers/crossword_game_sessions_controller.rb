@@ -14,5 +14,8 @@ class CrosswordGameSessionsController < ApplicationController
       @clue_coordinates[[ row, col ]] = clue_number
       clue_number += 1
     end
+
+    @words = @crossword_game_session.words.map(&:hiragana)
+    @answers = @crossword_game_session.words.map(&:hiragana)
   end
 end

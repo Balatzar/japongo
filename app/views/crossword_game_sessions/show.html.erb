@@ -1,19 +1,24 @@
-<div class="flex flex-col items-center w-full max-w-3xl mx-auto">
-  <div id="crossword-game" data-controller="crossword-game" class="mb-8 w-full">
+<div class="flex flex-col items-center w-full max-w-6xl mx-auto">
+  <div id="crossword-game" 
+       data-controller="crossword-game"
+       data-crossword-game-grid-value="<%= @crossword_game_session.grid.to_json %>"
+       class="mb-8 w-full">
     <div class="flex justify-center mb-4">
-      <table class="border-collapse">
+      <table class="border-collapse" data-crossword-game-target="grid">
         <% @crossword_game_session.grid.each_with_index do |row, row_index| %>
           <tr>
             <% row.each_with_index do |cell, col_index| %>
-              <td class="w-8 h-8 border border-gray-300 p-0">
+              <td class="w-16 h-16 border border-gray-300 p-0">
                 <% if cell == " " %>
                   <div class="w-full h-full bg-black"></div>
                 <% else %>
                   <div class="w-full h-full bg-white relative">
                     <% if cell != " " %>
-                      <span class="absolute top-0 left-0 text-xs"><%= @clue_coordinates[[row_index, col_index]] %></span>
+                      <span class="absolute top-0 left-0 text-sm font-bold p-1"><%= @clue_coordinates[[row_index, col_index]] %></span>
                     <% end %>
-                    <input type="text" maxlength="1" class="w-full h-full text-center focus:outline-none" data-row="<%= row_index %>" data-col="<%= col_index %>">
+                    <input type="text" maxlength="1" class="w-full h-full text-center text-3xl font-bold focus:outline-none"
+                           data-row="<%= row_index %>" data-col="<%= col_index %>"
+                           data-crossword-game-target="input">
                   </div>
                 <% end %>
               </td>
@@ -23,24 +28,24 @@
       </table>
     </div>
 
-    <div class="mb-4">
-      <h2 class="text-xl font-semibold mb-2">Clues</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="mb-4" data-crossword-game-target="clues">
+      <h2 class="text-2xl font-semibold mb-4">Clues</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
-          <h3 class="font-semibold mb-2">Across</h3>
-          <ul class="list-decimal pl-5">
+          <h3 class="text-xl font-semibold mb-2">Across</h3>
+          <ul class="list-decimal pl-5 space-y-2">
             <% @crossword_game_session.clues.select { |c| c["direction"] == "horizontal" }.each do |clue| %>
-              <li>
+              <li class="text-lg">
                 <%= @crossword_game_session.words.find { |word| word.hiragana == clue["word"]["hiragana"] }.english_meaning %>
               </li>
             <% end %>
           </ul>
         </div>
         <div>
-          <h3 class="font-semibold mb-2">Down</h3>
-          <ul class="list-decimal pl-5">
+          <h3 class="text-xl font-semibold mb-2">Down</h3>
+          <ul class="list-decimal pl-5 space-y-2">
             <% @crossword_game_session.clues.select { |c| c["direction"] == "vertical" }.each do |clue| %>
-              <li>
+              <li class="text-lg">
                 <%= @crossword_game_session.words.find { |word| word.hiragana == clue["word"]["hiragana"] }.english_meaning %>
               </li>
             <% end %>
@@ -48,5 +53,16 @@
         </div>
       </div>
     </div>
+
+    <div data-crossword-game-target="message" class="text-center text-xl font-semibold mt-4"></div>
   </div>
 </div>
+
+<style>
+  input.correct {
+    background-color: #d4edda;
+  }
+  input.incorrect {
+    background-color: #f8d7da;
+  }
+</style>
