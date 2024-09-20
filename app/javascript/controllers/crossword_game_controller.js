@@ -14,6 +14,7 @@ export default class extends Controller {
     this.currentWordDirection = null
     this.currentWordStartRow = null
     this.currentWordStartCol = null
+    this.lastClickedCell = null
   }
 
   initializeGame() {
@@ -27,7 +28,7 @@ export default class extends Controller {
     console.log("Updating input fields")
     const inputs = this.gridTarget.querySelectorAll('input')
     inputs.forEach((input, index) => {
-      input.dataset.action = "input->crossword-game#checkInput keydown->crossword-game#handleKeydown focus->crossword-game#handleFocus"
+      input.dataset.action = "input->crossword-game#checkInput keydown->crossword-game#handleKeydown focus->crossword-game#handleFocus click->crossword-game#handleCellClick"
       input.dataset.index = index
     })
     console.log("Input fields updated")
@@ -229,6 +230,75 @@ export default class extends Controller {
     this.currentWordStartRow = parseInt(clueElement.dataset.crosswordGameStartRow)
     this.currentWordStartCol = parseInt(clueElement.dataset.crosswordGameStartCol)
 
+    this.highlightWord(word, this.currentWordDirection, this.currentWordStartRow, this.currentWordStartCol)
+    this.highlightClue(clueElement)
+
+    // Focus on the first cell of the word
+    const firstInput = this.gridTarget.querySelector(`input[data-row="${this.currentWordStartRow}"][data-col="${this.currentWordStartCol}"]`)
+    if (firstInput) {
+      firstInput.focus()
+    }
+  }
+
+  handleCellClick(event) {
+    const input = event.target
+    const row = parseInt(input.dataset.row)
+    const col = parseInt(input.dataset.col)
+    console.log(`Cell clicked at row ${row}, col ${col}`)
+
+    if (this.gridValue[row][col] === " ") {
+      console.error("Clicked on a black cell")
+      return
+    }
+
+    const horizontalClue = this.findClueForCell(row, col, "horizontal")
+    const verticalClue = this.findClueForCell(row, col, "vertical")
+
+    if (horizontalClue && verticalClue) {
+      if (this.lastClickedCell === input) {
+        // Toggle between horizontal and vertical
+        this.currentWordDirection = this.currentWordDirection === "horizontal" ? "vertical" : "horizontal"
+      } else {
+        // Default to horizontal on first click
+        this.currentWordDirection = "horizontal"
+      }
+    } else if (horizontalClue) {
+      this.currentWordDirection = "horizontal"
+    } else if (verticalClue) {
+      this.currentWordDirection = "vertical"
+    } else {
+      console.error("No clue found for this cell")
+      return
+    }
+
+    const selectedClue = this.currentWordDirection === "horizontal" ? horizontalClue : verticalClue
+    this.highlightWord(selectedClue.word, this.currentWordDirection, selectedClue.startRow, selectedClue.startCol)
+    this.highlightClue(selectedClue.element)
+    
+    this.lastClickedCell = input
+    input.focus()
+  }
+
+  findClueForCell(row, col, direction) {
+    const clues = this.cluesTarget.querySelectorAll('li')
+    for (const clue of clues) {
+      const clueDirection = clue.dataset.crosswordGameDirection
+      const startRow = parseInt(clue.dataset.crosswordGameStartRow)
+      const startCol = parseInt(clue.dataset.crosswordGameStartCol)
+      const word = clue.dataset.crosswordGameWord
+
+      if (clueDirection === direction) {
+        if (direction === "horizontal" && row === startRow && col >= startCol && col < startCol + word.length) {
+          return { word, startRow, startCol, element: clue }
+        } else if (direction === "vertical" && col === startCol && row >= startRow && row < startRow + word.length) {
+          return { word, startRow, startCol, element: clue }
+        }
+      }
+    }
+    return null
+  }
+
+  highlightWord(word, direction, startRow, startCol) {
     // Remove previous highlights
     this.gridTarget.querySelectorAll('input').forEach(input => {
       input.classList.remove('highlighted')
@@ -236,10 +306,10 @@ export default class extends Controller {
 
     // Highlight the cells for the selected word
     for (let i = 0; i < word.length; i++) {
-      let row = this.currentWordStartRow
-      let col = this.currentWordStartCol
+      let row = startRow
+      let col = startCol
 
-      if (this.currentWordDirection === "horizontal") {
+      if (direction === "horizontal") {
         col += i
       } else {
         row += i
@@ -251,10 +321,18 @@ export default class extends Controller {
       }
     }
 
-    // Focus on the first cell of the word
-    const firstInput = this.gridTarget.querySelector(`input[data-row="${this.currentWordStartRow}"][data-col="${this.currentWordStartCol}"]`)
-    if (firstInput) {
-      firstInput.focus()
-    }
+    this.currentWordDirection = direction
+    this.currentWordStartRow = startRow
+    this.currentWordStartCol = startCol
+  }
+
+  highlightClue(clueElement) {
+    // Remove previous clue highlights
+    this.cluesTarget.querySelectorAll('li').forEach(li => {
+      li.classList.remove('highlighted-clue')
+    })
+
+    // Highlight the selected clue
+    clueElement.classList.add('highlighted-clue')
   }
 }
