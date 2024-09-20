@@ -2,6 +2,7 @@
   <div id="crossword-game" 
        data-controller="crossword-game"
        data-crossword-game-grid-value="<%= @crossword_game_session.grid.to_json %>"
+       data-crossword-game-answers-value="<%= @crossword_game_session.words.map(&:hiragana).to_json %>"
        class="mb-8 w-full">
     <div class="flex justify-center mb-4">
       <table class="border-collapse" data-crossword-game-target="grid">
@@ -26,6 +27,12 @@
           </tr>
         <% end %>
       </table>
+    </div>
+
+    <div class="flex justify-center mb-4">
+      <button data-action="click->crossword-game#getHint" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+        Get Hint
+      </button>
     </div>
 
     <div class="mb-4" data-crossword-game-target="clues">

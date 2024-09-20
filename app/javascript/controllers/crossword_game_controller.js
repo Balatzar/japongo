@@ -3,7 +3,8 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static targets = ["grid", "input", "message"]
   static values = {
-    grid: Array
+    grid: Array,
+    answers: Array
   }
 
   connect() {
@@ -118,5 +119,35 @@ export default class extends Controller {
   updateMessage(message) {
     console.log("Updating message:", message)
     this.messageTarget.textContent = message
+  }
+
+  getHint() {
+    console.log("Getting hint")
+    const emptyCells = this.getEmptyCells()
+    if (emptyCells.length === 0) {
+      this.updateMessage("No empty cells left!")
+      return
+    }
+
+    const randomCell = emptyCells[Math.floor(Math.random() * emptyCells.length)]
+    const input = randomCell.input
+    const row = parseInt(input.dataset.row)
+    const col = parseInt(input.dataset.col)
+    const correctLetter = this.gridValue[row][col]
+
+    input.value = correctLetter
+    input.classList.add('correct')
+    input.dispatchEvent(new Event('input'))
+
+    this.updateMessage("Hint provided! A random cell has been filled.")
+  }
+
+  getEmptyCells() {
+    const inputs = this.gridTarget.querySelectorAll('input')
+    return Array.from(inputs).filter(input => {
+      const row = parseInt(input.dataset.row)
+      const col = parseInt(input.dataset.col)
+      return this.gridValue[row][col] !== " " && input.value === ""
+    }).map(input => ({ input, row: parseInt(input.dataset.row), col: parseInt(input.dataset.col) }))
   }
 }
