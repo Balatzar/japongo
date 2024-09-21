@@ -13,3 +13,10 @@
  *= require_tree .
  *= require_self
  */
+
+.montserrat-logo {
+  font-family: "Montserrat", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 900;
+  font-style: normal;
+}

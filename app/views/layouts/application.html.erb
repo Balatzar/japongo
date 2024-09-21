@@ -17,13 +17,16 @@
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
   </head>
 
   <body class="h-full flex flex-col">
     <header class="bg-gradient-to-br from-blue-600 to-blue-400 text-white">
       <div class="container mx-auto px-4">
         <div class="flex justify-between items-center py-4">
-          <h1 class="text-4xl font-bold">Japongo</h1>
+          <h1 class="text-4xl montserrat-logo">Japongo</h1>
           <div class="flex items-center">
             <%= link_to "Play", games_path, class: "bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-full text-lg" %>
           </div>
