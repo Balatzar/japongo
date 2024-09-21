@@ -10,11 +10,14 @@
     ["が", "ぎ", "ぐ", "げ", "ご", "ざ", "じ", "ず", "ぜ", "ぞ"],
     ["だ", "ぢ", "づ", "で", "ど", "ば", "び", "ぶ", "べ", "ぼ"],
   ] %>
+  <% special = [
+    ["っ", "ゃ", "ゅ", "ょ"],
+  ] %>
 
-  <% (hiragana + dakuon).each do |row| %>
+  <% (hiragana + dakuon + special).each do |row| %>
     <div class="hiragana-row">
       <% row.each do |char| %>
-        <button type="button" class="hiragana-key <%= 'dakuon' if dakuon.flatten.include?(char) %>" data-action="click->hiragana-keyboard#inputHiragana" data-hiragana-keyboard-target="key" data-character="<%= char %>">
+        <button type="button" class="hiragana-key <%= 'dakuon' if dakuon.flatten.include?(char) %> <%= 'special' if special.flatten.include?(char) %>" data-action="click->hiragana-keyboard#inputHiragana" data-hiragana-keyboard-target="key" data-character="<%= char %>">
           <%= char %>
         </button>
       <% end %>
@@ -47,6 +50,9 @@
   }
   .hiragana-key.dakuon {
     background-color: #e6f2ff;
+  }
+  .hiragana-key.special {
+    background-color: #f9e6f2;
   }
   .hiragana-key.dakuon:hover {
     background-color: #ccebff;
