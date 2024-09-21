@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html class="h-full">
   <head>
     <title><%= content_for(:title) || "Japongo" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -19,13 +19,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
   </head>
 
-  <body>
+  <body class="h-full flex flex-col">
     <header class="bg-blue-600 text-white p-4">
       <div class="container mx-auto flex justify-between items-center">
         <h1 class="text-3xl font-bold">Japongo</h1>
         <%= link_to word_of_the_day_path, class: "text-white hover:text-blue-200 text-xl font-semibold border-b-2 border-transparent hover:border-white transition duration-300" do %>
           <span class="mr-2">Word of the day:</span>
-          <span class="text-2xl"><%= WordOfTheDayService.word_of_the_day.hiragana %></span>
+          <span class="text-2xl"><%= WordOfTheDayService.word_of_the_day.kanji %></span>
         <% end %>
       </div>
     </header>
@@ -37,7 +37,7 @@
         <%= link_to "Play", games_path, class: "bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded" %>
       </ul>
     </nav>
-    <main class="container mx-auto mt-28 px-5 flex">
+    <main class="flex-grow flex">
       <%= yield %>
     </main>
   </body>

@@ -1,8 +1,17 @@
-<h1>Word of the Day</h1>
-
-<div class="word-of-the-day">
-  <h2><%= @word.hiragana %></h2>
-  <p><strong>Romanji:</strong> <%= @word.romanji %></p>
-  <p><strong>Kanji:</strong> <%= @word.kanji %></p>
-  <p><strong>English Meaning:</strong> <%= @word.english_meaning %></p>
+<div class="flex items-center justify-center w-full h-full bg-gradient-to-br from-pink-100 to-blue-100 p-4">
+  <div class="w-full max-w-2xl bg-white rounded-lg shadow-lg transition-all duration-300 hover:shadow-xl">
+    <div class="text-center p-6">
+      <h1 class="text-2xl font-bold text-blue-600 mb-6">Word of the Day</h1>
+      <div class="space-y-2">
+        <div class="text-5xl font-bold text-blue-700"><%= @word.kanji %></div>
+        <div class="text-2xl text-gray-600"><%= @word.hiragana %></div>
+        <div class="text-3xl text-gray-700"><%= @word.english_meaning %></div>
+      </div>
+    </div>
+    <div class="flex justify-center p-6">
+      <a href="https://jisho.org/search/<%= @word.kanji %>" target="_blank" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition-colors duration-200">
+        Learn More
+      </a>
+    </div>
+  </div>
 </div>
