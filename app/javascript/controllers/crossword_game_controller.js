@@ -3,7 +3,7 @@ import { Controller } from "@hotwired/stimulus";
 export default class extends Controller {
   static targets = ["grid", "input", "message", "clues", "createCardButton"];
   static values = {
-    grid: Array,
+    gameState: Array,
     answers: Array,
   };
 
@@ -21,7 +21,7 @@ export default class extends Controller {
     console.log("Initializing game");
     this.updateInputFields();
     this.updateMessage("Start solving the crossword!");
-    console.log("Grid value:", this.gridValue);
+    console.log("Game State value:", this.gameStateValue);
   }
 
   updateInputFields() {
@@ -54,14 +54,14 @@ export default class extends Controller {
     const col = parseInt(input.dataset.col);
     console.log(`Checking input at row ${row}, col ${col}`);
 
-    if (this.gridValue[row][col] === " ") {
+    if (this.gameStateValue[row][col].answer === " ") {
       console.error("Trying to input into a black cell");
       input.value = "";
       return;
     }
 
     console.log("Input value:", input.value);
-    console.log("Expected value:", this.gridValue[row][col]);
+    console.log("Expected value:", this.gameStateValue[row][col].answer);
 
     if (this.isGridFilled()) {
       console.log("Grid is filled, validating");
@@ -135,7 +135,7 @@ export default class extends Controller {
 
   isGridFilled() {
     const inputs = this.gridTarget.querySelectorAll("input");
-    const filled = Array.from(inputs).every((input) => input.value !== "");
+    const filled = Array.from(inputs).every((input) => input.value !== "" || input.readOnly);
     console.log("Is grid filled:", filled);
     return filled;
   }
@@ -149,9 +149,9 @@ export default class extends Controller {
       const row = parseInt(input.dataset.row);
       const col = parseInt(input.dataset.col);
 
-      if (this.gridValue[row][col] !== " ") {
+      if (this.gameStateValue[row][col].answer !== " ") {
         const inputValue = input.value.toLowerCase();
-        const expectedValue = this.gridValue[row][col].toLowerCase();
+        const expectedValue = this.gameStateValue[row][col].answer.toLowerCase();
         console.log(
           `Validating cell (${row}, ${col}):`,
           inputValue,
@@ -212,11 +212,16 @@ export default class extends Controller {
     const input = randomCell.input;
     const row = parseInt(input.dataset.row);
     const col = parseInt(input.dataset.col);
-    const correctLetter = this.gridValue[row][col];
+    const correctLetter = this.gameStateValue[row][col].answer;
 
     input.value = correctLetter;
     input.classList.add("correct");
+    input.readOnly = true;
     input.dispatchEvent(new Event("input"));
+
+    // Update the game state
+    this.gameStateValue[row][col].input = correctLetter;
+    this.gameStateValue[row][col].hint = true;
 
     this.updateMessage("Hint provided! A random cell has been filled.");
   }
@@ -227,7 +232,7 @@ export default class extends Controller {
       .filter((input) => {
         const row = parseInt(input.dataset.row);
         const col = parseInt(input.dataset.col);
-        return this.gridValue[row][col] !== " " && input.value === "";
+        return this.gameStateValue[row][col].answer !== " " && input.value === "" && !input.readOnly;
       })
       .map((input) => ({
         input,
@@ -238,7 +243,7 @@ export default class extends Controller {
 
   addHiraganaKeyboardListener() {
     document.addEventListener("hiragana-keyboard:input", (event) => {
-      if (this.currentInput) {
+      if (this.currentInput && !this.currentInput.readOnly) {
         this.currentInput.value = event.detail.character;
         this.currentInput.dispatchEvent(new Event("input", { bubbles: true }));
       }
@@ -280,7 +285,7 @@ export default class extends Controller {
     const col = parseInt(input.dataset.col);
     console.log(`Cell clicked at row ${row}, col ${col}`);
 
-    if (this.gridValue[row][col] === " ") {
+    if (this.gameStateValue[row][col].answer === " ") {
       console.error("Clicked on a black cell");
       return;
     }
