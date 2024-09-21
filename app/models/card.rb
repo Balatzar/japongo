@@ -34,7 +34,6 @@ class Card < ApplicationRecord
   end
 
   def process_review(grade)
-    review = reviews.create(grade: grade, reviewed_at: Time.current, review_duration: 0) # You may want to track actual review duration
     update_sm2_params(grade)
     schedule_next_review
     save
@@ -48,8 +47,8 @@ class Card < ApplicationRecord
   end
 
   def update_sm2_params(grade)
-    self.ease_factor = [1.3, ease_factor + (0.1 - (3 - grade) * (0.08 + (3 - grade) * 0.02))].max
-    
+    self.ease_factor = [ 1.3, ease_factor + (0.1 - (3 - grade) * (0.08 + (3 - grade) * 0.02)) ].max
+
     if grade < 3
       self.repetitions = 0
       self.interval = 1
