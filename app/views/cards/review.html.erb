@@ -1,25 +1,29 @@
 <% if @card %>
-  <div class="card-review">
-    <h1>Review Card</h1>
+  <div class="card-review mx-auto w-2/3 mt-8 p-8 bg-blue-50 rounded-xl shadow-lg">
+    <h1 class="text-4xl font-bold mb-8 text-center text-gray-800">Review Card</h1>
     
-    <div class="card-front">
-      <h2>Front</h2>
-      <p><%= @card.front %></p>
-    </div>
+    <div class="card-content bg-white p-8 rounded-lg shadow-inner">
+      <div class="card-front mb-8">
+        <h2 class="text-2xl font-semibold mb-4 text-gray-700">Front</h2>
+        <p class="text-3xl font-bold text-center text-gray-900"><%= @card.front %></p>
+      </div>
 
-    <button id="show-answer" onclick="showAnswer()">Show Answer</button>
+      <button id="show-answer" onclick="showAnswer()" class="w-full py-3 px-6 text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition duration-200 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+        Show Answer
+      </button>
 
-    <div id="card-back" class="card-back" style="display: none;">
-      <h2>Back</h2>
-      <p><%= @card.back %></p>
+      <div id="card-back" class="card-back mt-8" style="display: none;">
+        <h2 class="text-2xl font-semibold mb-4 text-gray-700">Back</h2>
+        <p class="text-3xl font-bold text-center text-gray-900"><%= @card.back %></p>
 
-      <h3>How well did you remember this?</h3>
-      <%= form_with url: answer_cards_path, method: :post, local: true do |f| %>
-        <%= f.hidden_field :card_id, value: @card.id %>
-        <% {0 => "Incorrect", 1 => "Hard", 2 => "Good", 3 => "Easy"}.each do |grade, label| %>
-          <%= f.submit label, name: "grade", value: grade, class: "grade-button grade-#{grade}" %>
+        <h3 class="text-xl font-semibold mt-8 mb-4 text-gray-700">How well did you remember this?</h3>
+        <%= form_with url: answer_cards_path, method: :post, local: true, class: "grid grid-cols-1 gap-4 sm:grid-cols-3" do |f| %>
+          <%= f.hidden_field :card_id, value: @card.id %>
+          <% {1 => ["Hard", "bg-red-500 hover:bg-red-600"], 2 => ["Good", "bg-yellow-500 hover:bg-yellow-600"], 3 => ["Easy", "bg-green-500 hover:bg-green-600"]}.each do |grade, (label, color_class)| %>
+            <%= f.submit label, name: "grade", value: grade, class: "py-3 px-6 text-white #{color_class} rounded-lg transition duration-200 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-opacity-50 focus:ring-#{color_class.split[0]}" %>
+          <% end %>
         <% end %>
-      <% end %>
+      </div>
     </div>
   </div>
 
@@ -29,52 +33,8 @@
       document.getElementById("card-back").style.display = "block";
     }
   </script>
-
-  <style>
-    .card-review {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 20px;
-      text-align: center;
-    }
-
-    .card-front, .card-back {
-      background-color: #f0f0f0;
-      border-radius: 10px;
-      padding: 20px;
-      margin-bottom: 20px;
-    }
-
-    #show-answer {
-      background-color: #4CAF50;
-      border: none;
-      color: white;
-      padding: 15px 32px;
-      text-align: center;
-      text-decoration: none;
-      display: inline-block;
-      font-size: 16px;
-      margin: 4px 2px;
-      cursor: pointer;
-    }
-
-    .grade-button {
-      border: none;
-      color: white;
-      padding: 10px 20px;
-      text-align: center;
-      text-decoration: none;
-      display: inline-block;
-      font-size: 14px;
-      margin: 4px 2px;
-      cursor: pointer;
-    }
-
-    .grade-0 { background-color: #f44336; }
-    .grade-1 { background-color: #ff9800; }
-    .grade-2 { background-color: #4CAF50; }
-    .grade-3 { background-color: #2196F3; }
-  </style>
 <% else %>
-  <p>No cards due for review.</p>
+  <div class="max-w-2xl mx-auto mt-8 p-8 bg-blue-50 rounded-xl shadow-lg text-center">
+    <p class="text-2xl font-semibold text-gray-700">No cards due for review.</p>
+  </div>
 <% end %>
