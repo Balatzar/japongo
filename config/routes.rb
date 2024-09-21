@@ -45,7 +45,7 @@ Rails.application.routes.draw do
   get "word_of_the_day", to: "word_of_the_day#show", as: :word_of_the_day
 
   # Add routes for Cards
-  resources :cards, only: [:create] do
+  resources :cards do
     collection do
       get :review
       post :answer
