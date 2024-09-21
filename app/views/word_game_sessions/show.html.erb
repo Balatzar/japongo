@@ -1,65 +1,77 @@
-<div class="max-w-md mx-auto mt-8">
-  <h2 class="text-2xl font-bold mb-4">Word Game</h2>
-  
-  <% if @current_word %>
-    <div data-controller="word-game" 
-         data-word-game-word-id-value="<%= @current_word.id %>" 
-         data-word-game-session-id-value="<%= @word_game_session.id %>"
-         data-word-game-total-words-value="<%= @word_game_session.words.count %>"
-         data-word-game-current-index-value="<%= @word_game_session.current_word_index %>"
-         data-action="keydown@window->word-game#handleKeydown">
-      
-      <div class="mb-4 bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-        <div class="bg-blue-600 h-2.5 rounded-full" style="width: 0%;" data-word-game-target="progressBar"></div>
+<div class="flex items-center justify-center w-full h-full bg-gradient-to-b from-blue-100 to-white p-4">
+  <div class="bg-white rounded-lg shadow-xl p-8 max-w-md w-full">
+    <h1 class="text-3xl font-bold text-center mb-6 text-blue-600">Word Game</h1>
+    
+    <% if @current_word %>
+      <div data-controller="word-game" 
+           data-word-game-word-id-value="<%= @current_word.id %>" 
+           data-word-game-session-id-value="<%= @word_game_session.id %>"
+           data-word-game-total-words-value="<%= @word_game_session.words.count %>"
+           data-word-game-current-index-value="<%= @word_game_session.current_word_index %>"
+           data-action="keydown@window->word-game#handleKeydown">
+        
+        <!-- Progress bar -->
+        <div class="w-full bg-gray-200 rounded-full h-2.5 mb-4">
+          <div class="bg-blue-600 h-2.5 rounded-full" style="width: 0%;" data-word-game-target="progressBar"></div>
+        </div>
+        
+        <p class="text-sm text-gray-500 mb-8 text-center" data-word-game-target="progressText">Word 1 of <%= @word_game_session.words.count %></p>
+        
+        <div class="mb-6">
+          <h2 class="text-xl font-semibold mb-2">Translate the following hiragana:</h2>
+          <div class="text-6xl font-bold text-center mb-4"><%= @current_word.hiragana %></div>
+        </div>
+        
+        <%= form_with url: word_game_session_path(@word_game_session), method: :patch, data: { action: "submit->word-game#checkAnswer" }, class: "space-y-4" do |f| %>
+          <%= f.text_field :answer, 
+              class: "w-full px-3 py-2 text-lg border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500",
+              placeholder: "Enter romanji",
+              data: { "word-game-target": "input" } %>
+          <%= f.submit "Submit", 
+              class: "w-full bg-blue-600 text-white text-lg font-semibold py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" %>
+        <% end %>
+        
+        <div data-word-game-target="result" class="mt-4"></div>
+        <div data-word-game-target="meaning" class="mt-4 hidden">
+          <p class="font-bold">English Meaning: <span data-word-game-target="englishMeaning"></span></p>
+          <p class="font-bold">Kanji: <span data-word-game-target="kanji"></span></p>
+        </div>
+        <button data-action="click->word-game#nextWord keydown->word-game#nextWord" class="w-full bg-green-500 text-white text-lg font-semibold py-2 px-4 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 mt-4 hidden" data-word-game-target="nextButton">Next</button>
       </div>
-      <p class="text-sm text-gray-500 mb-4" data-word-game-target="progressText">Word 1 of <%= @word_game_session.words.count %></p>
-
-      <p class="text-lg mb-2">Translate the following hiragana:</p>
-      <p class="text-4xl font-bold mb-4"><%= @current_word.hiragana %></p>
-      
-      <%= form_with url: word_game_session_path(@word_game_session), method: :patch, data: { action: "submit->word-game#checkAnswer" } do |f| %>
-        <%= f.text_field :answer, class: "w-full p-2 border rounded mb-4", placeholder: "Enter romanji", data: { "word-game-target": "input" } %>
-        <%= f.submit "Submit", class: "bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded" %>
+    <% else %>
+      <p class="text-lg text-center">Finished! You've completed all the words.</p>
+      <p class="mt-4 text-center">
+        Correct answers: <%= @word_game_session.right_answers.count %><br>
+        Wrong answers: <%= @word_game_session.wrong_answers.count %>
+      </p>
+      <% if @word_game_session.wrong_answers.any? %>
+        <div class="mt-4">
+          <h3 class="text-xl font-bold mb-2">Wrong Answers:</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full border-collapse border border-gray-300">
+              <thead>
+                <tr>
+                  <th class="border border-gray-300 px-4 py-2">Hiragana</th>
+                  <th class="border border-gray-300 px-4 py-2">Romanji</th>
+                  <th class="border border-gray-300 px-4 py-2">English</th>
+                  <th class="border border-gray-300 px-4 py-2">Kanji</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% @word_game_session.wrong_answers.each do |word| %>
+                  <tr>
+                    <td class="border border-gray-300 px-4 py-2 font-bold"><%= word.hiragana %></td>
+                    <td class="border border-gray-300 px-4 py-2"><%= word.romanji %></td>
+                    <td class="border border-gray-300 px-4 py-2"><%= word.english_meaning %></td>
+                    <td class="border border-gray-300 px-4 py-2"><%= word.kanji %></td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        </div>
       <% end %>
-      
-      <div data-word-game-target="result" class="mt-4"></div>
-      <div data-word-game-target="meaning" class="mt-4 hidden">
-        <p class="font-bold">English Meaning: <span data-word-game-target="englishMeaning"></span></p>
-        <p class="font-bold">Kanji: <span data-word-game-target="kanji"></span></p>
-      </div>
-      <button data-action="click->word-game#nextWord keydown->word-game#nextWord" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded mt-4 hidden" data-word-game-target="nextButton">Next</button>
-    </div>
-  <% else %>
-    <p class="text-lg">Finished! You've completed all the words.</p>
-    <p class="mt-4">
-      Correct answers: <%= @word_game_session.right_answers.count %><br>
-      Wrong answers: <%= @word_game_session.wrong_answers.count %>
-    </p>
-    <% if @word_game_session.wrong_answers.any? %>
-      <div class="mt-4">
-        <h3 class="text-xl font-bold mb-2">Wrong Answers:</h3>
-        <table class="w-full border-collapse border border-gray-300">
-          <thead>
-            <tr>
-              <th class="border border-gray-300 px-4 py-2">Hiragana</th>
-              <th class="border border-gray-300 px-4 py-2">Romanji</th>
-              <th class="border border-gray-300 px-4 py-2">English</th>
-              <th class="border border-gray-300 px-4 py-2">Kanji</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% @word_game_session.wrong_answers.each do |word| %>
-              <tr>
-                <td class="border border-gray-300 px-4 py-2 font-bold"><%= word.hiragana %></td>
-                <td class="border border-gray-300 px-4 py-2"><%= word.romanji %></td>
-                <td class="border border-gray-300 px-4 py-2"><%= word.english_meaning %></td>
-                <td class="border border-gray-300 px-4 py-2"><%= word.kanji %></td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
-      </div>
+      <%= link_to "Play Again", init_word_game_sessions_path, class: "w-full bg-green-500 text-white text-lg font-semibold py-2 px-4 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 mt-4 inline-block text-center" %>
     <% end %>
-    <%= link_to "Play Again", init_word_game_sessions_path, class: "bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded mt-4 inline-block" %>
-  <% end %>
+  </div>
 </div>
