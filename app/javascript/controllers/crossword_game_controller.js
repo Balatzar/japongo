@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus";
 
 export default class extends Controller {
-  static targets = ["grid", "input", "message", "clues"];
+  static targets = ["grid", "input", "message", "clues", "createCardButton"];
   static values = {
     grid: Array,
     answers: Array,
@@ -184,6 +184,13 @@ export default class extends Controller {
     this.updateMessage("Congratulations! You've completed the crossword!");
     this.gridTarget.querySelectorAll("input").forEach((input) => {
       input.disabled = true;
+    });
+    this.showCreateCardButtons();
+  }
+
+  showCreateCardButtons() {
+    this.createCardButtonTargets.forEach((button) => {
+      button.classList.remove("hidden");
     });
   }
 

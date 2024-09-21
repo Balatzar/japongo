@@ -49,17 +49,20 @@
             <h3 class="text-xl font-semibold mb-2">Across</h3>
             <ul class="pl-5 space-y-2 list-none">
               <% @crossword_game_session.clues.select { |c| c["direction"] == "horizontal" }.each do |clue| %>
-                <li class="text-lg cursor-pointer hover:text-blue-600"
+                <li class="text-lg cursor-pointer hover:text-blue-600 flex items-center justify-between"
                     data-action="click->crossword-game#highlightClueWord"
                     data-crossword-game-word="<%= clue["word"]["hiragana"] %>"
                     data-crossword-game-direction="horizontal"
                     data-crossword-game-start-row="<%= clue["starting_index"][0] %>"
                     data-crossword-game-start-col="<%= clue["starting_index"][1] %>">
-                  <%= @clue_coordinates[clue["starting_index"]] %> ·
-                  <%= @crossword_game_session.words.find { |word| word.hiragana == clue["word"]["hiragana"] }.english_meaning %>
-                  <% if @easy_mode %>
-                    <span class="text-sm text-gray-500 ml-2">(<%= clue["word"]["romanji"] %>)</span>
-                  <% end %>
+                  <span>
+                    <%= @clue_coordinates[clue["starting_index"]] %> ·
+                    <%= @crossword_game_session.words.find { |word| word.hiragana == clue["word"]["hiragana"] }.english_meaning %>
+                    <% if @easy_mode %>
+                      <span class="text-sm text-gray-500 ml-2">(<%= clue["word"]["romanji"] %>)</span>
+                    <% end %>
+                  </span>
+                  <%= button_to "Create Card", cards_path(word_id: @crossword_game_session.words.find { |word| word.hiragana == clue["word"]["hiragana"] }.id), method: :post, class: "bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-2 rounded transition-colors duration-200 text-sm ml-2 hidden", data: { "crossword-game-target": "createCardButton" } %>
                 </li>
               <% end %>
             </ul>
@@ -68,17 +71,20 @@
             <h3 class="text-xl font-semibold mb-2">Down</h3>
             <ul class="pl-5 space-y-2 list-none">
               <% @crossword_game_session.clues.select { |c| c["direction"] == "vertical" }.each do |clue| %>
-                <li class="text-lg cursor-pointer hover:text-blue-600"
+                <li class="text-lg cursor-pointer hover:text-blue-600 flex items-center justify-between"
                     data-action="click->crossword-game#highlightClueWord"
                     data-crossword-game-word="<%= clue["word"]["hiragana"] %>"
                     data-crossword-game-direction="vertical"
                     data-crossword-game-start-row="<%= clue["starting_index"][0] %>"
                     data-crossword-game-start-col="<%= clue["starting_index"][1] %>">
-                  <%= @clue_coordinates[clue["starting_index"]] %> ·
-                  <%= @crossword_game_session.words.find { |word| word.hiragana == clue["word"]["hiragana"] }.english_meaning %>
-                  <% if @easy_mode %>
-                    <span class="text-sm text-gray-500 ml-2">(<%= clue["word"]["romanji"] %>)</span>
-                  <% end %>
+                  <span>
+                    <%= @clue_coordinates[clue["starting_index"]] %> ·
+                    <%= @crossword_game_session.words.find { |word| word.hiragana == clue["word"]["hiragana"] }.english_meaning %>
+                    <% if @easy_mode %>
+                      <span class="text-sm text-gray-500 ml-2">(<%= clue["word"]["romanji"] %>)</span>
+                    <% end %>
+                  </span>
+                  <%= button_to "Create Card", cards_path(word_id: @crossword_game_session.words.find { |word| word.hiragana == clue["word"]["hiragana"] }.id), method: :post, class: "bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-2 rounded transition-colors duration-200 text-sm ml-2 hidden", data: { "crossword-game-target": "createCardButton" } %>
                 </li>
               <% end %>
             </ul>

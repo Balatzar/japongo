@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = [ "input", "result", "meaning", "englishMeaning", "kanji", "nextButton", "progressBar", "progressText" ]
+  static targets = [ "input", "result", "meaning", "englishMeaning", "kanji", "nextButton", "progressBar", "progressText", "createCardButton" ]
   static values = {
     wordId: Number,
     sessionId: Number,
@@ -50,6 +50,7 @@ export default class extends Controller {
       this.kanjiTarget.textContent = data.kanji
       this.meaningTarget.classList.remove("hidden")
       this.nextButtonTarget.classList.remove("hidden")
+      this.createCardButtonTarget.classList.remove("hidden")
       this.nextButtonTarget.focus()
 
       if (data.completed) {
