@@ -1,7 +1,7 @@
 class WordGameSessionsController < ApplicationController
   def init
     @word_game_session = WordGameSession.create!
-    redirect_to @word_game_session, notice: "Game started!"
+    redirect_to @word_game_session
   end
 
   def show
