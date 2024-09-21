@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_09_21_094146) do
+ActiveRecord::Schema[7.2].define(version: 2024_09_21_111245) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -59,11 +59,12 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_21_094146) do
     t.text "front"
     t.text "back"
     t.datetime "next_review"
-    t.integer "interval"
-    t.float "ease_factor"
-    t.integer "repetitions"
+    t.integer "interval", default: 0
+    t.float "ease_factor", default: 2.5
+    t.integer "repetitions", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["front"], name: "index_cards_on_front", unique: true
   end
 
   create_table "connections", force: :cascade do |t|

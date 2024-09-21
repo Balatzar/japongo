@@ -44,5 +44,13 @@ Rails.application.routes.draw do
   # Add route for Word of the Day
   get "word_of_the_day", to: "word_of_the_day#show", as: :word_of_the_day
 
+  # Add routes for Cards
+  resources :cards, only: [:create] do
+    collection do
+      get :review
+      post :answer
+    end
+  end
+
   root "games#index"
 end

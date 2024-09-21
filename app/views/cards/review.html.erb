@@ -1,0 +1,80 @@
+<% if @card %>
+  <div class="card-review">
+    <h1>Review Card</h1>
+    
+    <div class="card-front">
+      <h2>Front</h2>
+      <p><%= @card.front %></p>
+    </div>
+
+    <button id="show-answer" onclick="showAnswer()">Show Answer</button>
+
+    <div id="card-back" class="card-back" style="display: none;">
+      <h2>Back</h2>
+      <p><%= @card.back %></p>
+
+      <h3>How well did you remember this?</h3>
+      <%= form_with url: answer_cards_path, method: :post, local: true do |f| %>
+        <%= f.hidden_field :card_id, value: @card.id %>
+        <% {0 => "Incorrect", 1 => "Hard", 2 => "Good", 3 => "Easy"}.each do |grade, label| %>
+          <%= f.submit label, name: "grade", value: grade, class: "grade-button grade-#{grade}" %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+
+  <script>
+    function showAnswer() {
+      document.getElementById("show-answer").style.display = "none";
+      document.getElementById("card-back").style.display = "block";
+    }
+  </script>
+
+  <style>
+    .card-review {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .card-front, .card-back {
+      background-color: #f0f0f0;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    #show-answer {
+      background-color: #4CAF50;
+      border: none;
+      color: white;
+      padding: 15px 32px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin: 4px 2px;
+      cursor: pointer;
+    }
+
+    .grade-button {
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 14px;
+      margin: 4px 2px;
+      cursor: pointer;
+    }
+
+    .grade-0 { background-color: #f44336; }
+    .grade-1 { background-color: #ff9800; }
+    .grade-2 { background-color: #4CAF50; }
+    .grade-3 { background-color: #2196F3; }
+  </style>
+<% else %>
+  <p>No cards due for review.</p>
+<% end %>

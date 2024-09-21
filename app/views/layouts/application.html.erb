@@ -33,10 +33,18 @@
             <li><%= link_to "Hiraganas", hiraganas_path, class: "text-white hover:text-blue-200 text-lg" %></li>
             <li><%= link_to "Building blocks", building_blocks_path, class: "text-white hover:text-blue-200 text-lg" %></li>
             <li><%= link_to "Words", words_path, class: "text-white hover:text-blue-200 text-lg" %></li>
+            <li><%= link_to "Review Cards", review_cards_path, class: "text-white hover:text-blue-200 text-lg" %></li>
           </ul>
         </nav>
       </div>
     </header>
+
+    <% flash.each do |type, message| %>
+      <div class="<%= type == 'notice' ? 'bg-green-100 border-green-400 text-green-700' : 'bg-red-100 border-red-400 text-red-700' %> border px-4 py-3 rounded relative" role="alert">
+        <span class="block sm:inline"><%= message %></span>
+      </div>
+    <% end %>
+
     <div class="bg-blue-700 text-white py-2">
       <div class="container mx-auto px-4">
         <%= link_to word_of_the_day_path, class: "text-white hover:text-blue-200 text-xl font-semibold" do %>
