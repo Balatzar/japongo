@@ -41,5 +41,8 @@ Rails.application.routes.draw do
   # Add routes for Games
   resources :games, only: [ :index ]
 
+  # Add route for Word of the Day
+  get "word_of_the_day", to: "word_of_the_day#show", as: :word_of_the_day
+
   root "games#index"
 end
