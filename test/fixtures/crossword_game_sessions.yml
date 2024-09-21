@@ -1,17 +1,19 @@
 # == Schema Information
 #
-# Table name: building_blocks
+# Table name: crossword_game_sessions
 #
 #  id         :bigint           not null, primary key
-#  name       :string
+#  clues      :json
+#  easy_mode  :boolean          default(FALSE)
+#  grid       :json
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #
 
 one:
-  name: MyString
-  image: MyString
+  grid: 
+  clues: 
 
 two:
-  name: MyString
-  image: MyString
+  grid: 
+  clues: 
