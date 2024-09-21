@@ -33,7 +33,14 @@
             <li><%= link_to "Hiraganas", hiraganas_path, class: "text-white hover:text-blue-200 text-lg" %></li>
             <li><%= link_to "Building blocks", building_blocks_path, class: "text-white hover:text-blue-200 text-lg" %></li>
             <li><%= link_to "Words", words_path, class: "text-white hover:text-blue-200 text-lg" %></li>
-            <li><%= link_to "Review Cards", review_cards_path, class: "text-white hover:text-blue-200 text-lg" %></li>
+            <li>
+              <%= link_to review_cards_path, class: "text-white hover:text-blue-200 text-lg flex items-center" do %>
+                Review Cards
+                <% if (count = Card.count_due_for_review) > 0 %>
+                  <span class="ml-2 px-2 py-1 bg-red-500 text-white text-xs font-bold rounded-full"><%= count %></span>
+                <% end %>
+              <% end %>
+            </li>
           </ul>
         </nav>
       </div>

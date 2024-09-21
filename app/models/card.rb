@@ -29,6 +29,10 @@ class Card < ApplicationRecord
 
   after_create :set_initial_review_date
 
+  def self.count_due_for_review
+    due_for_review.count
+  end
+
   def process_review(grade)
     review = reviews.create(grade: grade, reviewed_at: Time.current, review_duration: 0) # You may want to track actual review duration
     update_sm2_params(grade)
