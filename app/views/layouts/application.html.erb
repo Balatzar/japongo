@@ -20,23 +20,31 @@
   </head>
 
   <body class="h-full flex flex-col">
-    <header class="bg-blue-600 text-white p-4">
-      <div class="container mx-auto flex justify-between items-center">
-        <h1 class="text-3xl font-bold">Japongo</h1>
-        <%= link_to word_of_the_day_path, class: "text-white hover:text-blue-200 text-xl font-semibold border-b-2 border-transparent hover:border-white transition duration-300" do %>
+    <header class="bg-gradient-to-br from-blue-600 to-blue-400 text-white">
+      <div class="container mx-auto px-4">
+        <div class="flex justify-between items-center py-4">
+          <h1 class="text-4xl font-bold">Japongo</h1>
+          <div class="flex items-center">
+            <%= link_to "Play", games_path, class: "bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-full text-lg" %>
+          </div>
+        </div>
+        <nav class="py-2">
+          <ul class="flex space-x-6">
+            <li><%= link_to "Hiraganas", hiraganas_path, class: "text-white hover:text-blue-200 text-lg" %></li>
+            <li><%= link_to "Building blocks", building_blocks_path, class: "text-white hover:text-blue-200 text-lg" %></li>
+            <li><%= link_to "Words", words_path, class: "text-white hover:text-blue-200 text-lg" %></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+    <div class="bg-blue-700 text-white py-2">
+      <div class="container mx-auto px-4">
+        <%= link_to word_of_the_day_path, class: "text-white hover:text-blue-200 text-xl font-semibold" do %>
           <span class="mr-2">Word of the day:</span>
           <span class="text-2xl"><%= WordOfTheDayService.word_of_the_day.kanji %></span>
         <% end %>
       </div>
-    </header>
-    <nav class="bg-blue-500 p-2">
-      <ul class="flex justify-center space-x-4">
-        <li><%= link_to "Hiraganas", hiraganas_path, class: "text-white hover:text-blue-200" %></li>
-        <li><%= link_to "Building blocks", building_blocks_path, class: "text-white hover:text-blue-200" %></li>
-        <li><%= link_to "Words", words_path, class: "text-white hover:text-blue-200" %></li>
-        <%= link_to "Play", games_path, class: "bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded" %>
-      </ul>
-    </nav>
+    </div>
     <main class="flex-grow flex">
       <%= yield %>
     </main>
