@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_09_20_170556) do
+ActiveRecord::Schema[7.2].define(version: 2024_09_21_094146) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -55,6 +55,27 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_20_170556) do
     t.index ["hiragana_id", "building_block_id"], name: "idx_on_hiragana_id_building_block_id_27eb2f5085"
   end
 
+  create_table "cards", force: :cascade do |t|
+    t.text "front"
+    t.text "back"
+    t.datetime "next_review"
+    t.integer "interval"
+    t.float "ease_factor"
+    t.integer "repetitions"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "connections", force: :cascade do |t|
+    t.integer "source_node_id"
+    t.integer "target_node_id"
+    t.bigint "skill_tree_id", null: false
+    t.boolean "required_to_unlock"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["skill_tree_id"], name: "index_connections_on_skill_tree_id"
+  end
+
   create_table "crossword_game_sessions", force: :cascade do |t|
     t.json "grid"
     t.json "clues"
@@ -77,6 +98,64 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_20_170556) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "translated_name"
+  end
+
+  create_table "quests", force: :cascade do |t|
+    t.string "name"
+    t.text "description"
+    t.boolean "unlocked"
+    t.boolean "completed"
+    t.bigint "skill_node_id", null: false
+    t.jsonb "stat_reward"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["skill_node_id"], name: "index_quests_on_skill_node_id"
+  end
+
+  create_table "reviews", force: :cascade do |t|
+    t.bigint "card_id", null: false
+    t.datetime "reviewed_at"
+    t.integer "grade"
+    t.integer "review_duration"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["card_id"], name: "index_reviews_on_card_id"
+  end
+
+  create_table "skill_nodes", force: :cascade do |t|
+    t.string "name"
+    t.text "description"
+    t.bigint "skill_tree_id", null: false
+    t.integer "position_x"
+    t.integer "position_y"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["skill_tree_id"], name: "index_skill_nodes_on_skill_tree_id"
+  end
+
+  create_table "skill_trees", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "stat_modifiers", force: :cascade do |t|
+    t.bigint "skill_node_id", null: false
+    t.bigint "stat_id", null: false
+    t.integer "value"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["skill_node_id"], name: "index_stat_modifiers_on_skill_node_id"
+    t.index ["stat_id"], name: "index_stat_modifiers_on_stat_id"
+  end
+
+  create_table "stats", force: :cascade do |t|
+    t.string "name"
+    t.text "description"
+    t.bigint "skill_tree_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["skill_tree_id"], name: "index_stats_on_skill_tree_id"
   end
 
   create_table "word_game_sessions", force: :cascade do |t|
@@ -117,4 +196,11 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_20_170556) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "connections", "skill_trees"
+  add_foreign_key "quests", "skill_nodes"
+  add_foreign_key "reviews", "cards"
+  add_foreign_key "skill_nodes", "skill_trees"
+  add_foreign_key "stat_modifiers", "skill_nodes"
+  add_foreign_key "stat_modifiers", "stats"
+  add_foreign_key "stats", "skill_trees"
 end

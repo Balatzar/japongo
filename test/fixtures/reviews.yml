@@ -1,0 +1,32 @@
+# == Schema Information
+#
+# Table name: reviews
+#
+#  id              :bigint           not null, primary key
+#  grade           :integer
+#  review_duration :integer
+#  reviewed_at     :datetime
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
+#  card_id         :bigint           not null
+#
+# Indexes
+#
+#  index_reviews_on_card_id  (card_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (card_id => cards.id)
+#
+
+one:
+  card: one
+  reviewed_at: 2024-09-21 11:41:46
+  grade: 1
+  review_duration: 1
+
+two:
+  card: two
+  reviewed_at: 2024-09-21 11:41:46
+  grade: 1
+  review_duration: 1
