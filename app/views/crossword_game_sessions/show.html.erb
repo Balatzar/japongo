@@ -4,6 +4,7 @@
         data-controller="crossword-game"
         data-crossword-game-game-state-value="<%= @crossword_game_session.game_state.to_json %>"
         data-crossword-game-answers-value="<%= @crossword_game_session.words.map(&:hiragana).to_json %>"
+        data-crossword-game-game-id-value="<%= @crossword_game_session.id %>"
         class="mb-8 w-full">
       <div class="flex justify-center mb-4">
         <table class="border-collapse" data-crossword-game-target="grid">

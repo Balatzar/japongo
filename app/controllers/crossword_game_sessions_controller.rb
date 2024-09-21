@@ -26,4 +26,13 @@ class CrosswordGameSessionsController < ApplicationController
     @crossword_game_session.update(easy_mode: !@crossword_game_session.easy_mode)
     redirect_to @crossword_game_session
   end
+
+  def update_game_state
+    @crossword_game_session = CrosswordGameSession.find(params[:id])
+    if @crossword_game_session.update(game_state: params[:game_state])
+      render json: { status: "success" }
+    else
+      render json: { status: "error", message: @crossword_game_session.errors.full_messages }, status: :unprocessable_entity
+    end
+  end
 end

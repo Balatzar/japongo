@@ -32,6 +32,7 @@ Rails.application.routes.draw do
   resources :crossword_game_sessions, only: [ :show ] do
     member do
       patch :toggle_easy_mode
+      patch :update_game_state
     end
     collection do
       get :init

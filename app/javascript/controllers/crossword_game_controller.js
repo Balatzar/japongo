@@ -5,6 +5,7 @@ export default class extends Controller {
   static values = {
     gameState: Array,
     answers: Array,
+    gameId: Number,
   };
 
   connect() {
@@ -60,7 +61,15 @@ export default class extends Controller {
       return;
     }
 
+    // Update the game state
+    const newGameState = JSON.parse(JSON.stringify(this.gameStateValue));
+    newGameState[row][col].input = input.value;
+    this.gameStateValue = newGameState;
+
+    console.log("Game state updated:", this.gameStateValue);
     console.log("Input value:", input.value);
+    this.syncGameState();
+
     console.log("Expected value:", this.gameStateValue[row][col].answer);
 
     if (this.isGridFilled()) {
@@ -135,7 +144,9 @@ export default class extends Controller {
 
   isGridFilled() {
     const inputs = this.gridTarget.querySelectorAll("input");
-    const filled = Array.from(inputs).every((input) => input.value !== "" || input.readOnly);
+    const filled = Array.from(inputs).every(
+      (input) => input.value !== "" || input.readOnly
+    );
     console.log("Is grid filled:", filled);
     return filled;
   }
@@ -151,7 +162,8 @@ export default class extends Controller {
 
       if (this.gameStateValue[row][col].answer !== " ") {
         const inputValue = input.value.toLowerCase();
-        const expectedValue = this.gameStateValue[row][col].answer.toLowerCase();
+        const expectedValue =
+          this.gameStateValue[row][col].answer.toLowerCase();
         console.log(
           `Validating cell (${row}, ${col}):`,
           inputValue,
@@ -220,8 +232,12 @@ export default class extends Controller {
     input.dispatchEvent(new Event("input"));
 
     // Update the game state
-    this.gameStateValue[row][col].input = correctLetter;
-    this.gameStateValue[row][col].hint = true;
+    const newGameState = JSON.parse(JSON.stringify(this.gameStateValue));
+    newGameState[row][col].input = correctLetter;
+    newGameState[row][col].hint = true;
+    this.gameStateValue = newGameState;
+
+    this.syncGameState();
 
     this.updateMessage("Hint provided! A random cell has been filled.");
   }
@@ -232,7 +248,11 @@ export default class extends Controller {
       .filter((input) => {
         const row = parseInt(input.dataset.row);
         const col = parseInt(input.dataset.col);
-        return this.gameStateValue[row][col].answer !== " " && input.value === "" && !input.readOnly;
+        return (
+          this.gameStateValue[row][col].answer !== " " &&
+          input.value === "" &&
+          !input.readOnly
+        );
       })
       .map((input) => ({
         input,
@@ -396,5 +416,30 @@ export default class extends Controller {
 
     // Highlight the selected clue
     clueElement.classList.add("highlighted-clue");
+  }
+
+  syncGameState() {
+    const csrfToken = document
+      .querySelector('meta[name="csrf-token"]')
+      .getAttribute("content");
+    fetch(`/crossword_game_sessions/${this.gameIdValue}/update_game_state`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-Token": csrfToken,
+      },
+      body: JSON.stringify({ game_state: this.gameStateValue }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.status === "success") {
+          console.log("Game state synchronized successfully");
+        } else {
+          console.error("Failed to synchronize game state:", data.message);
+        }
+      })
+      .catch((error) => {
+        console.error("Error synchronizing game state:", error);
+      });
   }
 }
