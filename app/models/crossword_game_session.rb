@@ -15,6 +15,14 @@ class CrosswordGameSession < ApplicationRecord
 
   before_create :initialize_game
 
+  def completed?
+    game_state.all? do |row|
+      row.all? do |cell|
+        cell["answer"] == " " || cell["input"] == cell["answer"]
+      end
+    end
+  end
+
   private
 
   def initialize_game

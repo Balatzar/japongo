@@ -6,6 +6,7 @@ export default class extends Controller {
     gameState: Array,
     answers: Array,
     gameId: Number,
+    completed: Boolean,
   };
 
   connect() {
@@ -21,7 +22,11 @@ export default class extends Controller {
   initializeGame() {
     console.log("Initializing game");
     this.updateInputFields();
-    this.updateMessage("Start solving the crossword!");
+    if (this.completedValue) {
+      this.gameWon();
+    } else {
+      this.updateMessage("Start solving the crossword!");
+    }
     console.log("Game State value:", this.gameStateValue);
   }
 
@@ -32,6 +37,11 @@ export default class extends Controller {
       input.dataset.action =
         "input->crossword-game#checkInput keydown->crossword-game#handleKeydown focus->crossword-game#handleFocus click->crossword-game#handleCellClick";
       input.dataset.index = index;
+      const row = parseInt(input.dataset.row);
+      const col = parseInt(input.dataset.col);
+      if (this.gameStateValue[row][col].input === this.gameStateValue[row][col].answer) {
+        input.classList.add("correct");
+      }
     });
     console.log("Input fields updated");
   }

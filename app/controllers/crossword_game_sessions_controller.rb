@@ -19,6 +19,7 @@ class CrosswordGameSessionsController < ApplicationController
     @words = @crossword_game_session.words.map(&:hiragana)
     @answers = @crossword_game_session.words.map(&:hiragana)
     @easy_mode = @crossword_game_session.easy_mode
+    @completed = @crossword_game_session.completed?
   end
 
   def toggle_easy_mode

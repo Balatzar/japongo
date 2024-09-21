@@ -5,6 +5,7 @@
         data-crossword-game-game-state-value="<%= @crossword_game_session.game_state.to_json %>"
         data-crossword-game-answers-value="<%= @crossword_game_session.words.map(&:hiragana).to_json %>"
         data-crossword-game-game-id-value="<%= @crossword_game_session.id %>"
+        data-crossword-game-completed-value="<%= @completed %>"
         class="mb-8 w-full">
       <div class="flex justify-center mb-4">
         <table class="border-collapse" data-crossword-game-target="grid">
@@ -19,7 +20,7 @@
                       <% if cell["answer"] != " " %>
                         <span class="absolute top-0 left-0 text-sm font-bold p-1"><%= @clue_coordinates[[row_index, col_index]] %></span>
                       <% end %>
-                      <input type="text" maxlength="1" class="w-full h-full text-center text-3xl font-bold focus:outline-none"
+                      <input type="text" maxlength="1" class="w-full h-full text-center text-3xl font-bold focus:outline-none <%= 'correct' if cell['hint'] %>"
                             data-row="<%= row_index %>" data-col="<%= col_index %>"
                             data-crossword-game-target="input"
                             value="<%= cell["hint"] ? cell["answer"] : cell["input"] %>"
