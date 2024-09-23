@@ -1,15 +1,15 @@
 <div class="container mx-auto px-4 py-8">
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    <div class="bg-white shadow-md rounded-lg p-6">
-      <h2 class="text-xl font-semibold mb-4">Hiragana to Romanji</h2>
-      <p class="mb-4">Test your Hiragana knowledge with our Game!</p>
-      <%= link_to "Start Word Game", init_word_game_sessions_path, class: "bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded", data: { turbo: false } %>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl w-full mx-auto">
+    <div class="bg-gradient-to-br from-blue-400 to-purple-500 shadow-md rounded-lg p-8 text-white">
+      <h2 class="text-2xl font-semibold mb-4 text-center">Hiragana to Romanji</h2>
+      <p class="mb-6">Test your Hiragana knowledge with our Game!</p>
+      <%= link_to "Start Word Game", init_word_game_sessions_path, class: "bg-white text-blue-500 hover:bg-blue-100 font-bold py-3 px-6 rounded block text-center transition duration-300", data: { turbo: false } %>
     </div>
 
-    <div class="bg-white shadow-md rounded-lg p-6">
-      <h2 class="text-xl font-semibold mb-4">Japanese Crossword</h2>
-      <p class="mb-4">Challenge yourself with our Japanese Crossword Game!</p>
-      <%= link_to "Start Crossword Game", init_crossword_game_sessions_path, class: "bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded", data: { turbo: false } %>
+    <div class="bg-gradient-to-br from-green-400 to-teal-500 shadow-md rounded-lg p-8 text-white">
+      <h2 class="text-2xl font-semibold mb-4 text-center">Japanese Crossword</h2>
+      <p class="mb-6">Challenge yourself with our Japanese Crossword Game!</p>
+      <%= link_to "Start Crossword Game", init_crossword_game_sessions_path, class: "bg-white text-green-500 hover:bg-green-100 font-bold py-3 px-6 rounded block text-center transition duration-300", data: { turbo: false } %>
     </div>
   </div>
-<div>
+</div>
