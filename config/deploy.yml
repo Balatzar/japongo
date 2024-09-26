@@ -56,12 +56,25 @@ accessories:
     directories:
       - data:/var/lib/postgresql/data # Mount a volume to persist the database data
 
-# Configure custom arguments for Traefik. Be sure to reboot traefik when you modify it.
-# traefik:
-#   args:
-#     accesslog: true
-#     accesslog.format: json
-
+traefik:
+  args:
+    entryPoints:
+      web:
+        address: ":80"
+      dashboard:
+        address: ":8080"
+    providers:
+      docker: {}
+    api:
+      dashboard: true
+  labels:
+    traefik.enable: "true"
+    traefik.http.routers.japongo-web.rule: "Host(`188.245.86.168`)"
+    traefik.http.routers.japongo-web.entrypoints: "web"
+    traefik.http.services.japongo-web.loadbalancer.server.port: "3000"
+    traefik.http.routers.dashboard.rule: "Host(`188.245.86.168`)"
+    traefik.http.routers.dashboard.entrypoints: "dashboard"
+    traefik.http.services.dashboard.loadbalancer.server.port: "8080"
 # Configure a custom healthcheck (default is /up on port 3000)
 # healthcheck:
 #   path: /healthz
