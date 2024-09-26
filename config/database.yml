@@ -84,5 +84,5 @@ production:
   database: japongo_db
   username: japongo_user
   password: <%= ENV['POSTGRES_PASSWORD'] %>
-  host: 172.17.0.3
+  host: <%= ENV['DB_HOST'] || '188.245.86.168' %>
   port: <%= ENV['DB_PORT'] || 5432 %>
