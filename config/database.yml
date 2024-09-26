@@ -19,7 +19,6 @@ default: &default
   # https://guides.rubyonrails.org/configuring.html#database-pooling
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
 
-
 development:
   <<: *default
   database: japongo_development
@@ -79,7 +78,11 @@ test:
 # for a full overview on how database connection configuration can be specified.
 #
 production:
-  <<: *default
-  database: japongo_production
-  username: japongo
-  password: <%= ENV["JAPONGO_DATABASE_PASSWORD"] %>
+  adapter: postgresql
+  encoding: unicode
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  database: japongo_db
+  username: japongo_user
+  password: <%= ENV['POSTGRES_PASSWORD'] %>
+  host: 172.17.0.3
+  port: <%= ENV['DB_PORT'] || 5432 %>

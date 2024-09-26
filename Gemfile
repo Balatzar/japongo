@@ -56,6 +56,7 @@ group :development do
 
   # Add annotations to your models, routes, fixtures, and others
   gem "annotate"
+  gem "kamal"
 end
 
 group :test do
