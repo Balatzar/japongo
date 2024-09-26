@@ -103,5 +103,5 @@ Rails.application.configure do
   config.hosts << "localhost"
   config.hosts << "0.0.0.0"
   config.hosts << "188.245.86.168"
-  config.hosts << "172.17.0.4"
+  config.hosts << /172\.17\.\d+\.\d+/
 end
