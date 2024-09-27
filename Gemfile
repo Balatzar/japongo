@@ -57,6 +57,9 @@ group :development do
   # Add annotations to your models, routes, fixtures, and others
   gem "annotate"
   gem "kamal"
+
+  # Seed dump for database seeds
+  gem "seed_dump"
 end
 
 group :test do
