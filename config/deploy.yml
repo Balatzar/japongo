@@ -8,6 +8,10 @@ image: balatzar/japongo
 servers:
   - 188.245.86.168
 
+proxy:
+  ssl: true
+  host: japongo.balthazar.consulting
+
 # Credentials for your image host.
 registry:
   # Specify the registry server, if you're not using Docker Hub
@@ -37,7 +41,6 @@ env:
 #   user: app
 
 builder:
-  local: true
   arch: amd64
 
 # Use accessory services (secrets come from .env).
